@@ -1,21 +1,23 @@
 #include <iostream>
 #include <string>
 
+using namespace std;
+
 class Order {
     private: 
-        std::string clientOrderId;
-        std::string instrument;
+        string clientOrderId;
+        string instrument;
         int side;
         double price;
         int quantity;
 
     public: 
-        Order(const std::string& clientOrderIdPtr, const std::string& instrumentPtr, int side, double price, int quantity) {
-            clientOrderId = *clientOrderIdPtr;
-            instrument = *instrumentPtr;
+        Order(const string& clientOrderIdPtr, const string& instrumentPtr, int side, double price, int quantity) {
+            clientOrderId = clientOrderIdPtr;
+            instrument = instrumentPtr;
             side = side;
             price = price;
             quantity = quantity;
         }   
         
-}
+};
