@@ -4,11 +4,13 @@
 #include <vector>
 #include <string>
 
-std::vector<std::string> split(const std::string& str, char delimiter) {
-    std::vector<std::string> tokens;
-    std::istringstream stream(str);
-    std::string token;
-    while (std::getline(stream, token, delimiter)) {
+using namespace std;
+
+vector<string> split(const string& str, char delimiter) {
+    vector<string> tokens;
+    istringstream stream(str);
+    string token;
+    while (getline(stream, token, delimiter)) {
         tokens.push_back(token);
     }
     return tokens;
@@ -19,27 +21,27 @@ class ExchangeApplication {
         static ExchangeApplication& get() { return ex_app;}
 
         int readFile(){
-            std::string filename;
+            string filename;
 
-            std::cout << "Enter the name of the file you want to read: ";
-            std::cin >> filename;
+            cout << "Enter the name of the file you want to read: ";
+            cin >> filename;
 
-            std::ifstream file(filename + ".csv");
+            ifstream file(filename + ".csv");
 
             if (!file.is_open()) {
-                std::cerr << "Error opening file.\n";
+                cerr << "Error opening file.\n";
                 return 1;
             }
 
-            std::string line;
-            while (std::getline(file, line)) {
+            string line;
+            while (getline(file, line)) {
 
-                std::vector<std::string> tokens = split(line, ',');
+                vector<string> tokens = split(line, ',');
 
                 for (const auto& token : tokens) {
-                    std::cout << token << " ";
+                    cout << token << " ";
                 }
-                std::cout << '\n';
+                cout << '\n';
             }
 
             file.close();
