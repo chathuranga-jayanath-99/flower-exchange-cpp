@@ -18,8 +18,13 @@ class ExchangeApplication {
     public: 
         static ExchangeApplication& get() { return ex_app;}
 
-        void readFile(){
-            std::ifstream file("example.csv"); // Replace "example.csv" with your CSV file's name
+        int readFile(){
+            std::string filename;
+
+            std::cout << "Enter the name of the file you want to read: ";
+            std::cin >> filename;
+
+            std::ifstream file(filename + ".csv");
 
             if (!file.is_open()) {
                 std::cerr << "Error opening file.\n";
@@ -38,6 +43,7 @@ class ExchangeApplication {
             }
 
             file.close();
+            return 0;
         }
 
     private: 
@@ -47,6 +53,11 @@ class ExchangeApplication {
         static ExchangeApplication ex_app;   
 
 
-}
+};
 
 ExchangeApplication ExchangeApplication::ex_app;
+
+int main() {
+    ExchangeApplication& ex_app = ExchangeApplication::get();
+    ex_app.readFile();
+}
