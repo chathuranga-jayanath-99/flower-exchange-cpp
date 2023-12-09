@@ -1,21 +1,10 @@
-#include <iostream>
 #include <string>
+#include "Order.h"
 
-class Order {
-    private: 
-        std::string clientOrderId;
-        std::string instrument;
-        int side;
-        double price;
-        int quantity;
-
-    public: 
-        Order(const std::string& clientOrderIdPtr, const std::string& instrumentPtr, int side, double price, int quantity) {
-            clientOrderId = *clientOrderIdPtr;
-            instrument = *instrumentPtr;
-            side = side;
-            price = price;
-            quantity = quantity;
-        }   
-        
+Order::Order(const string& clientOrderIdPtr, const string& instrumentPtr, int side, double price, int quantity) {
+    this->clientOrderId = clientOrderIdPtr;
+    this->instrument = instrumentPtr;
+    this->side = side;
+    this->price = price;
+    this->quantity = quantity;
 }
