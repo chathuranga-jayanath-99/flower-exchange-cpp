@@ -1,66 +1,48 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
+#include "Heap.h"
 
 using namespace std;
 
-class Heap {
-    public:
-        void insert(int value);  
-        int pop_top();
-        virtual bool is_empty() = 0; 
+MaxHeap::MaxHeap(vector<int> values) {
+    heap = values;
+    make_heap(heap.begin(), heap.end());
 };
 
-class MaxHeap : public Heap {
-    private:
-        vector<int> heap;
-
-    public:
-        MaxHeap(vector<int> values) {
-            heap = values;
-            make_heap(heap.begin(), heap.end());
-        };
-
-        void insert(int value) {
-            heap.push_back(value);
-            push_heap(heap.begin(), heap.end());
-        }
-
-        int pop_top() {
-            pop_heap(heap.begin(), heap.end());
-            int top = heap.back();
-            heap.pop_back();
-            return top;
-        }
-
-        bool is_empty() {
-            return heap.begin() == heap.end();
-        }
+void MaxHeap::insert(int value) {
+    heap.push_back(value);
+    push_heap(heap.begin(), heap.end());
 };
 
-class MinHeap : public Heap {
-    private:
-        vector<int> heap;
-    
-    public:
-        MinHeap(vector<int> values) {
-            heap = values;
-            make_heap(heap.begin(), heap.end(), greater<>{});
-        }
+int MaxHeap::pop_top() {
+    pop_heap(heap.begin(), heap.end());
+    int top = heap.back();
+    heap.pop_back();
+    return top;
+};
 
-        void insert(int value) {
-            heap.push_back(value);
-            push_heap(heap.begin(), heap.end(), greater<>{});
-        }
+bool MaxHeap::is_empty() {
+    return heap.begin() == heap.end();
+};
 
-        int pop_top() {
-            pop_heap(heap.begin(), heap.end(), greater<>{});
-            int top = heap.back();
-            heap.pop_back();
-            return top;
-        }
+MinHeap::MinHeap(vector<int> values) {
+    heap = values;
+    make_heap(heap.begin(), heap.end(), greater<>{});
+};
 
-        bool is_empty() {
-            return heap.begin() == heap.end();
-        }
+void MinHeap::insert(int value) {
+    heap.push_back(value);
+    push_heap(heap.begin(), heap.end(), greater<>{});
+};
+
+int MinHeap::pop_top() {
+    pop_heap(heap.begin(), heap.end(), greater<>{});
+    int top = heap.back();
+    heap.pop_back();
+    return top;
+};
+
+bool MinHeap::is_empty() {
+    return heap.begin() == heap.end();
 };
