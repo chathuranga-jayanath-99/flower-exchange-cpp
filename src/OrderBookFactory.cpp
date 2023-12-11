@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Heap.h"
 
 class BaseOrderBook{
     public:
@@ -16,6 +17,10 @@ class BaseOrderBook{
         }
 
         virtual const std::string& getInstrument() = 0;
+    
+    private:
+        MaxHeap* buySide;
+        MinHeap* sellSide;
 };
 
 
