@@ -1,9 +1,11 @@
+#include "OrderBook.h"
 #include <iostream>
 #include <string>
 
-class OrderBook {
-    private: 
+using namespace std;
 
-    public: 
-        
+void BaseOrderBook::processOrder(Order &order) {
+  if (order.getSide() == 1) {
+    // Processing logic
+  }
 }

@@ -18,3 +18,6 @@ void Order::printOrder() {
   cout << "Price: " << this->price << endl;
   cout << "Quantity: " << this->quantity << endl;
 }
+
+string Order::getInstrument() { return this->instrument; };
+int Order::getSide() { return this->side; };

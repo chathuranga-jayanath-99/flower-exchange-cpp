@@ -14,4 +14,6 @@ public:
   Order(const string &clientOrderIdPtr, const string &instrumentPtr, int side,
         double price, int quantity);
   void printOrder();
+  string getInstrument();
+  int getSide();
 };
