@@ -21,7 +21,47 @@ class ExchangeApplication {
 public:
   static ExchangeApplication &get() { return ex_app; }
 
-  int readFile() {
+  int *filterTokens(vector<string> &tokens) {
+
+    int *result = new int[2]; // result[0] = 1 if valid, 0 if invalid
+                              // result[1] = error code
+
+    for (auto &token : tokens) {
+      if (token == "") {
+        result[0] = 0;
+        result[1] = 0;
+        return result;
+      }
+    }
+
+    int side = stoi(tokens[2]);
+    int price = stod(tokens[3]);
+    int quantity = stoi(tokens[4]);
+
+    if (side > 2 || side < 1) {
+      result[0] = 0;
+      result[1] = 1;
+      return result;
+    }
+
+    if (price <= 0) {
+      result[0] = 0;
+      result[1] = 2;
+      return result;
+    }
+
+    if (quantity < 10 || quantity > 1000 || quantity % 10 != 0) {
+      result[0] = 0;
+      result[1] = 3;
+      return result;
+    }
+
+    result[0] = 1;
+    result[1] = 0;
+    return result;
+  }
+
+  void readFile(vector<vector<string>> &lines) {
     string filename;
 
     cout << "Enter the name of the file you want to read: ";
@@ -34,7 +74,7 @@ public:
 
     if (!file.is_open()) {
       cerr << "Error opening file.\n";
-      return 1;
+      return;
     }
 
     string header;
@@ -45,16 +85,19 @@ public:
 
       vector<string> tokens = split(line, ',');
 
-      Order newOrder(tokens[0], tokens[1], stoi(tokens[2]), stod(tokens[3]),
-                     stoi(tokens[4]));
+      int *result = filterTokens(tokens);
 
-      newOrder.printOrder();
-
-      cout << '\n';
+      if (result[0] == 0) {
+        cout << "Error in line: " << line << endl;
+        cout << "Error code: " << result[1] << endl;
+        continue;
+      } else {
+        lines.push_back(tokens);
+      }
     }
 
     file.close();
-    return 0;
+    return;
   }
 
 private:
@@ -68,5 +111,15 @@ ExchangeApplication ExchangeApplication::ex_app;
 
 int main() {
   ExchangeApplication &ex_app = ExchangeApplication::get();
-  ex_app.readFile();
+
+  vector<vector<string>> lines;
+
+  ex_app.readFile(lines);
+
+  for (auto &line : lines) {
+    for (auto &token : line) {
+      cout << token << " ";
+    }
+    cout << endl;
+  }
 }
