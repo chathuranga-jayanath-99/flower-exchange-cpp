@@ -1,65 +1,66 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
-#include <vector>
 #include <string>
+#include <vector>
 
 using namespace std;
 
-vector<string> split(const string& str, char delimiter) {
-    vector<string> tokens;
-    istringstream stream(str);
-    string token;
-    while (getline(stream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
+vector<string> split(const string &str, char delimiter) {
+  vector<string> tokens;
+  istringstream stream(str);
+  string token;
+  while (getline(stream, token, delimiter)) {
+    tokens.push_back(token);
+  }
+  return tokens;
 }
 
 class ExchangeApplication {
-    public: 
-        static ExchangeApplication& get() { return ex_app;}
+public:
+  static ExchangeApplication &get() { return ex_app; }
 
-        int readFile(){
-            string filename;
+  int readFile() {
+    string filename;
 
-            cout << "Enter the name of the file you want to read: ";
-            cin >> filename;
+    cout << "Enter the name of the file you want to read: ";
+    cin >> filename;
 
-            ifstream file(filename + ".csv");
+    string fullFileName = "./testcases/" + filename + ".csv";
+    cout << fullFileName;
 
-            if (!file.is_open()) {
-                cerr << "Error opening file.\n";
-                return 1;
-            }
+    ifstream file(fullFileName);
 
-            string line;
-            while (getline(file, line)) {
+    if (!file.is_open()) {
+      cerr << "Error opening file.\n";
+      return 1;
+    }
 
-                vector<string> tokens = split(line, ',');
+    string line;
+    while (getline(file, line)) {
 
-                for (const auto& token : tokens) {
-                    cout << token << " ";
-                }
-                cout << '\n';
-            }
+      vector<string> tokens = split(line, ',');
 
-            file.close();
-            return 0;
-        }
+      for (const auto &token : tokens) {
+        cout << token << " ";
+      }
+      cout << '\n';
+    }
 
-    private: 
-        ExchangeApplication() {};
-        ~ExchangeApplication() {};
+    file.close();
+    return 0;
+  }
 
-        static ExchangeApplication ex_app;   
+private:
+  ExchangeApplication(){};
+  ~ExchangeApplication(){};
 
-
+  static ExchangeApplication ex_app;
 };
 
 ExchangeApplication ExchangeApplication::ex_app;
 
 int main() {
-    ExchangeApplication& ex_app = ExchangeApplication::get();
-    ex_app.readFile();
+  ExchangeApplication &ex_app = ExchangeApplication::get();
+  ex_app.readFile();
 }
