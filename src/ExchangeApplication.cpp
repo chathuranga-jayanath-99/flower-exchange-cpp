@@ -1,3 +1,4 @@
+#include "Order.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -36,14 +37,19 @@ public:
       return 1;
     }
 
+    string header;
+    getline(file, header);
+
     string line;
     while (getline(file, line)) {
 
       vector<string> tokens = split(line, ',');
 
-      for (const auto &token : tokens) {
-        cout << token << " ";
-      }
+      Order newOrder(tokens[0], tokens[1], stoi(tokens[2]), stod(tokens[3]),
+                     stoi(tokens[4]));
+
+      newOrder.printOrder();
+
       cout << '\n';
     }
 
