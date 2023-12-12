@@ -21,4 +21,6 @@ class Order {
     int getSide();
     double getPrice();
     int getQuantity();
+
+    void setQuantity(int quantity);
 };

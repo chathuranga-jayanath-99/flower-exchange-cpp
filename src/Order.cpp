@@ -28,3 +28,5 @@ string Order::getInstrument() { return this->instrument; };
 int Order::getSide() { return this->side; };
 double Order::getPrice() { return this->price; };
 int Order::getQuantity() { return this->quantity; };
+
+void Order::setQuantity(int quantity) { this->quantity = quantity; };
