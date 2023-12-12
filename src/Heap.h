@@ -1,3 +1,4 @@
+#include "OrderBookItem.h"
 #include <string>
 #include <vector>
 
@@ -5,30 +6,37 @@ using namespace std;
 
 class Heap {
     public:
-        void insert(int value);  
-        int pop_top();
+        virtual void insert(OrderBookItem orderBookItem) = 0;
+        virtual OrderBookItem peek_top() = 0;  
+        virtual OrderBookItem pop_top() = 0;
         virtual bool is_empty() = 0; 
+        virtual void update_top_item_quantity(int newQuantity) = 0;
 };
 
 class MaxHeap : public Heap {
     private:
-        vector<int> heap;
+        vector<OrderBookItem> heap;
 
     public:
-        MaxHeap(vector<int> values);
-        void insert(int value);
-        int pop_top();
+        MaxHeap(vector<OrderBookItem> orderBookItems);
+        MaxHeap();
+        void insert(OrderBookItem orderBookItem);
+        OrderBookItem peek_top();
+        OrderBookItem pop_top();
         bool is_empty();
+        void update_top_item_quantity(int newQuantity);
 };
 
 class MinHeap : public Heap {
     private:
-        vector<int> heap;
+        vector<OrderBookItem> heap;
     
     public:
-        MinHeap(vector<int> values);
-        void insert(int value);
-        int pop_top();
+        MinHeap(vector<OrderBookItem> orderBookItems);
+        MinHeap();
+        void insert(OrderBookItem orderBookItem);
+        OrderBookItem peek_top();
+        OrderBookItem pop_top();
         bool is_empty();
+        void update_top_item_quantity(int newQuantity);
 };
-
