@@ -1,4 +1,3 @@
-*.csv
 build/
 *.exe
 *.h.gch
