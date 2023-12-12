@@ -3,17 +3,22 @@
 using namespace std;
 
 class Order {
-private:
-  string clientOrderId;
-  string instrument;
-  int side;
-  double price;
-  int quantity;
+  private:
+    string orderID;
+    string clientOrderId;
+    string instrument;
+    int side;
+    double price;
+    int quantity;
 
-public:
-  Order(const string &clientOrderIdPtr, const string &instrumentPtr, int side,
-        double price, int quantity);
-  void printOrder();
-  string getInstrument();
-  int getSide();
+  public:
+    Order(const string &orderID, const string &clientOrderIdPtr,
+          const string &instrumentPtr, int side, double price, int quantity);
+    void printOrder();
+    string getOrderID();
+    string getClientOrderId();
+    string getInstrument();
+    int getSide();
+    double getPrice();
+    int getQuantity();
 };
