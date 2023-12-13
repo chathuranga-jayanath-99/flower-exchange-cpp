@@ -10,6 +10,7 @@ using namespace std;
 class BaseOrderBook {
   public:
     BaseOrderBook();
+    ~BaseOrderBook();
     void addOrder(const string &clientOrderIdPtr, const string &instrumentPtr,
                   int side, double price, int quantity);
     void modifyOrder(const string &clientOrderIdPtr, const string &instrumentPtr,
