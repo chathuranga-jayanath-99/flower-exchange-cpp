@@ -1,35 +1,34 @@
+#include "Heap.h"
+#include "Order.h"
 #include <algorithm>
 #include <vector>
 #include <iostream>
-#include "Heap.h"
 
 using namespace std;
 
-MaxHeap::MaxHeap(vector<OrderBookItem> orderBookItems) {
-    heap = orderBookItems;
+MaxHeap::MaxHeap(vector<Order> orders) {
+    heap = orders;
     make_heap(heap.begin(), heap.end());
 };
 
 MaxHeap::MaxHeap() {
-    vector<OrderBookItem> v({});
+    vector<Order> v({});
     heap = v;
     make_heap(heap.begin(), heap.end());
 };
 
-void MaxHeap::insert(OrderBookItem orderBookItem) {
-    cout << "insert max heap" << endl;
-    heap.push_back(orderBookItem);
+void MaxHeap::insert(Order order) {
+    heap.push_back(order);
     push_heap(heap.begin(), heap.end());
-    cout << "finish insert max heap" << endl;
 };
 
-OrderBookItem MaxHeap::peek_top() {
+Order MaxHeap::peek_top() {
     return heap[0];
 };
 
-OrderBookItem MaxHeap::pop_top() {
+Order MaxHeap::pop_top() {
     pop_heap(heap.begin(), heap.end());
-    OrderBookItem top = heap.back();
+    Order top = heap.back();
     heap.pop_back();
     return top;
 };
@@ -39,32 +38,32 @@ bool MaxHeap::is_empty() {
 };
 
 void MaxHeap::update_top_item_quantity(int newQuantity) {
-    heap[0].setQty(newQuantity);
+    heap[0].setQuantity(newQuantity);
 };
 
-MinHeap::MinHeap(vector<OrderBookItem> values) {
+MinHeap::MinHeap(vector<Order> values) {
     heap = values;
     make_heap(heap.begin(), heap.end(), greater<>{});
 };
 
 MinHeap::MinHeap() {
-    vector<OrderBookItem> v({});
+    vector<Order> v({});
     heap = v;
     make_heap(heap.begin(), heap.end(), greater<>{});
 };
 
-void MinHeap::insert(OrderBookItem value) {
+void MinHeap::insert(Order value) {
     heap.push_back(value);
     push_heap(heap.begin(), heap.end(), greater<>{});
 };
 
-OrderBookItem MinHeap::peek_top() {
+Order MinHeap::peek_top() {
     return heap[0];
 };
 
-OrderBookItem MinHeap::pop_top() {
+Order MinHeap::pop_top() {
     pop_heap(heap.begin(), heap.end(), greater<>{});
-    OrderBookItem top = heap.back();
+    Order top = heap.back();
     heap.pop_back();
     return top;
 };
@@ -74,6 +73,6 @@ bool MinHeap::is_empty() {
 };
 
 void MinHeap::update_top_item_quantity(int newQuantity) {
-    heap[0].setQty(newQuantity);
+    heap[0].setQuantity(newQuantity);
 }
 

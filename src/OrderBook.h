@@ -19,12 +19,12 @@ class BaseOrderBook {
                     int side, double price, int quantity);
     void addBuyOrder(Order &order);
     void addSellOrder(Order &order);
-    OrderBookItem getMaxBuyOrderItem();
-    OrderBookItem getMinSellOrderItem();
-    void removeMaxBuyOrderItem();
-    void removeMinSellOrderItem();
-    void updateMaxBuyOrderItemQuantity(int newQuantity);
-    void updateMinSellOrderItemQuantity(int newQuantity);
+    Order getMaxBuyOrder();
+    Order getMinSellOrder();
+    void removeMaxBuyOrder();
+    void removeMinSellOrder();
+    void updateMaxBuyOrderQuantity(int newQuantity);
+    void updateMinSellOrderQuantity(int newQuantity);
     bool isBuyersAvailable();
     bool isSellersAvailable();
     void printOrderBook();

@@ -17,10 +17,10 @@ class OrderBookItem {
         string getOrderId();
         int getQty();
         void setQty(int newQty);
-        bool operator<(const OrderBookItem& orderBookItem) const {
+        inline bool operator<(const OrderBookItem& orderBookItem) const {
             return price < orderBookItem.price;
         };
-        bool operator>(const OrderBookItem& orderBookItem) const {
+        inline bool operator>(const OrderBookItem& orderBookItem) const {
             return price > orderBookItem.price;
         };
 };

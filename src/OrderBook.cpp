@@ -15,27 +15,27 @@ BaseOrderBook::~BaseOrderBook() {
   delete sellSide;
 }
 
-OrderBookItem BaseOrderBook::getMaxBuyOrderItem() {
+Order BaseOrderBook::getMaxBuyOrder() {
   return buySide->peek_top();
 }
 
-OrderBookItem BaseOrderBook::getMinSellOrderItem() {
+Order BaseOrderBook::getMinSellOrder() {
   return sellSide->peek_top();
 }
 
-void BaseOrderBook::removeMaxBuyOrderItem(){
+void BaseOrderBook::removeMaxBuyOrder(){
   buySide->pop_top();
 }
 
-void BaseOrderBook::removeMinSellOrderItem(){
+void BaseOrderBook::removeMinSellOrder(){
   sellSide->pop_top();
 }
 
-void BaseOrderBook::updateMaxBuyOrderItemQuantity(int newQuantity) {
+void BaseOrderBook::updateMaxBuyOrderQuantity(int newQuantity) {
   buySide->update_top_item_quantity(newQuantity);
 }
 
-void BaseOrderBook::updateMinSellOrderItemQuantity(int newQuantity) {
+void BaseOrderBook::updateMinSellOrderQuantity(int newQuantity) {
   sellSide->update_top_item_quantity(newQuantity);
 }
 
@@ -48,13 +48,11 @@ bool BaseOrderBook::isSellersAvailable() {
 }
 
 void BaseOrderBook::addBuyOrder(Order &order) {
-  OrderBookItem orderBookItem(order.getOrderID(), order.getQuantity(), order.getPrice());
-  buySide->insert(orderBookItem);
+  buySide->insert(order);
 }
 
 void BaseOrderBook::addSellOrder(Order &order) {
-  OrderBookItem orderBookItem(order.getOrderID(), order.getQuantity(), order.getPrice());
-  sellSide->insert(orderBookItem);
+  sellSide->insert(order);
 }
 
 RoseOrderBook::RoseOrderBook() : BaseOrderBook() {
@@ -85,29 +83,33 @@ void BaseOrderBook::processOrder(Order &order) {
       if (BaseOrderBook::isSellersAvailable() == 1) {
         double orderBuyPrice = order.getPrice();
         int orderQty = order.getQuantity();
-        OrderBookItem minSellOrderItem = BaseOrderBook::getMinSellOrderItem();
-        if (minSellOrderItem.getPrice() <= orderBuyPrice) {
+        Order minSellOrder = BaseOrderBook::getMinSellOrder();
+        if (minSellOrder.getPrice() <= orderBuyPrice) {
           // buy for min sell price
           // check available quantity
-          if (orderQty == minSellOrderItem.getQty()) {
+          if (orderQty == minSellOrder.getQuantity()) {
             // remove sell order
-            BaseOrderBook::removeMinSellOrderItem();
+            BaseOrderBook::removeMinSellOrder();
+            break;
           } 
-          else if (orderQty < minSellOrderItem.getQty()) {
-            BaseOrderBook::updateMinSellOrderItemQuantity(minSellOrderItem.getQty() - orderQty);
+          else if (orderQty < minSellOrder.getQuantity()) {
+            BaseOrderBook::updateMinSellOrderQuantity(minSellOrder.getQuantity() - orderQty);
+            break;
           } 
           else {
             // update quantity
-            order.setQuantity(order.getQuantity() - minSellOrderItem.getQty());
-            BaseOrderBook::removeMinSellOrderItem();
+            order.setQuantity(order.getQuantity() - minSellOrder.getQuantity());
+            BaseOrderBook::removeMinSellOrder();
           }
         } else {
           // Enter order in buy side 
           BaseOrderBook::addBuyOrder(order);
+          break;
         }
       } else {
         // Enter order in buy side 
         BaseOrderBook::addBuyOrder(order);
+        break;
       }
     }
   } else if (order.getSide() == 2) {
@@ -117,19 +119,19 @@ void BaseOrderBook::processOrder(Order &order) {
       if (BaseOrderBook::isBuyersAvailable() == 1) {
         double orderSellPrice = order.getPrice();
         int orderSellQuantity = order.getQuantity();
-        OrderBookItem maxBuyOrderItem = BaseOrderBook::getMaxBuyOrderItem();
+        Order maxBuyOrderItem = BaseOrderBook::getMaxBuyOrder();
         if (maxBuyOrderItem.getPrice() >= orderSellPrice) {
           // sell for maxBuyOrderItem price 
           // check available quantity
-          if (orderSellQuantity == maxBuyOrderItem.getQty()) {
-            BaseOrderBook::removeMaxBuyOrderItem();
+          if (orderSellQuantity == maxBuyOrderItem.getQuantity()) {
+            BaseOrderBook::removeMaxBuyOrder();
             break;
-          } else if (orderSellQuantity < maxBuyOrderItem.getQty()) {
-            BaseOrderBook::updateMaxBuyOrderItemQuantity(maxBuyOrderItem.getQty() - orderSellQuantity);
+          } else if (orderSellQuantity < maxBuyOrderItem.getQuantity()) {
+            BaseOrderBook::updateMaxBuyOrderQuantity(maxBuyOrderItem.getQuantity() - orderSellQuantity);
             break;
           } else {
-            order.setQuantity(order.getQuantity() - maxBuyOrderItem.getQty());
-            BaseOrderBook::removeMaxBuyOrderItem();
+            order.setQuantity(order.getQuantity() - maxBuyOrderItem.getQuantity());
+            BaseOrderBook::removeMaxBuyOrder();
           }
         } else {
           // Enter order in sell side 
