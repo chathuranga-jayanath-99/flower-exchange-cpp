@@ -1,3 +1,6 @@
+#ifndef ORDER_BOOK_H 
+#define ORDER_BOOK_H
+
 #include "Heap.h"
 #include "Order.h"
 #include <iostream>
@@ -27,10 +30,6 @@ class BaseOrderBook {
     string &getInstrument();
     void processOrder(Order &order);
   
-  // protected;
-  //   MaxHeap* getBuySide();
-  //   MaxHeap* getSellSide();
-
   private:
     MaxHeap* buySide;
     MinHeap* sellSide;
@@ -60,3 +59,5 @@ class OrchidOrderBook : public BaseOrderBook {
   public:
     OrchidOrderBook();
 };
+
+#endif

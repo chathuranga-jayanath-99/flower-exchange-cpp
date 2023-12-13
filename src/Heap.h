@@ -1,3 +1,6 @@
+#ifndef HEAP_H
+#define HEAP_H
+
 #include "OrderBookItem.h"
 #include <string>
 #include <vector>
@@ -40,3 +43,5 @@ class MinHeap : public Heap {
         bool is_empty();
         void update_top_item_quantity(int newQuantity);
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef ORDER_H 
+#define ORDER_H
+
 #include <string>
 
 using namespace std;
@@ -24,3 +27,5 @@ class Order {
 
     void setQuantity(int quantity);
 };
+
+#endif

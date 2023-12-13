@@ -1,3 +1,6 @@
+#ifndef ORDER_BOOK_ITEM_H
+#define ORDER_BOOK_ITEM_H
+
 #include <iostream>
 
 using namespace std;
@@ -21,3 +24,5 @@ class OrderBookItem {
             return price > orderBookItem.price;
         };
 };
+
+#endif
