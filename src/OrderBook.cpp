@@ -6,54 +6,58 @@
 using namespace std;
 
 BaseOrderBook::BaseOrderBook() {
-  MaxHeap buyHeap();
-  MinHeap sellHeap();
+  MaxHeap buyHeap;
+  MinHeap sellHeap;
   buySide = &buyHeap;
   sellSide = &sellHeap;
 }
 
 OrderBookItem BaseOrderBook::getMaxBuyOrderItem() {
-  return buySide.peek_top();
+  return buySide->peek_top();
 }
 
 OrderBookItem BaseOrderBook::getMinSellOrderItem() {
-  return sellSide.peek_top();
+  return sellSide->peek_top();
 }
 
 void BaseOrderBook::removeMaxBuyOrderItem(){
-  buySide.pop_top();
+  buySide->pop_top();
 }
 
 void BaseOrderBook::removeMinSellOrderItem(){
-  sellSide.pop_top();
+  sellSide->pop_top();
 }
 
-void updateMaxBuyOrderItemQuantity() {
-
+void BaseOrderBook::updateMaxBuyOrderItemQuantity(int newQuantity) {
+  buySide->update_top_item_quantity(newQuantity);
 }
 
-void updateMinSellOrderItemQuantity() {
-
+void BaseOrderBook::updateMinSellOrderItemQuantity(int newQuantity) {
+  sellSide->update_top_item_quantity(newQuantity);
 }
 
 bool BaseOrderBook::isBuyersAvailable() {
-  return buySide.is_empty();
+  return !(buySide->is_empty());
 }
 
 bool BaseOrderBook::isSellersAvailable() {
-  return sellSide.is_empty();
+  return !(sellSide->is_empty());
 }
 
 void BaseOrderBook::addBuyOrder(Order &order) {
-  // OrderBookItem orderBookItem(order.getId(), order.getQty(), order.getPrice());
-  OrderBookItem orderBookItem("s1", 100, 100.0);
-  buySide.insert(orderBookItem);
+  OrderBookItem orderBookItem(order.getOrderID(), order.getQuantity(), order.getPrice());
+  // OrderBookItem orderBookItem("s1", 100, 100.0);
+  buySide->insert(orderBookItem);
 }
 
 void BaseOrderBook::addSellOrder(Order &order) {
-  // OrderBookItem orderBookItem(order.getId(), order.getQty(), order.getPrice());
-  OrderBookItem orderBookItem("s2", 100, 50.0);
-  sellSide.insert(orderBookItem);
+  cout << "add sell order" << endl;
+  OrderBookItem orderBookItem(order.getOrderID(), order.getQuantity(), order.getPrice());
+  cout << "orderBookItem created" << endl;
+  cout << sellSide->is_empty() << endl;
+  sellSide->insert(orderBookItem);
+  // sellSide->insert(orderBookItem);
+  cout << "end sell order" << endl;
 }
 
 RoseOrderBook::RoseOrderBook() : BaseOrderBook() {
@@ -79,7 +83,7 @@ OrchidOrderBook::OrchidOrderBook() : BaseOrderBook() {
 void BaseOrderBook::processOrder(Order &order) {
   if (order.getSide() == 1) {
     // Processing buy side logic
-    if (BaseOrderBook::isSellersAvailable() === 1) {
+    if (BaseOrderBook::isSellersAvailable() == 1) {
       double orderBuyPrice = order.getPrice();
       int orderQty = order.getQuantity();
       OrderBookItem minSellOrderItem = BaseOrderBook::getMinSellOrderItem();
@@ -95,7 +99,7 @@ void BaseOrderBook::processOrder(Order &order) {
         } 
         else {
           // update quantity
-          // order.setQuantity(order.getQuantity() - minSellOrderItem.getQty());
+          order.setQuantity(order.getQuantity() - minSellOrderItem.getQty());
           BaseOrderBook::removeMinSellOrderItem();
         }
       } else {
@@ -106,9 +110,9 @@ void BaseOrderBook::processOrder(Order &order) {
       // Enter order in buy side 
       BaseOrderBook::addBuyOrder(order);
     }
-  } else if (order.getSide == 2) {
+  } else if (order.getSide() == 2) {
     // Processing sell side logic
-    if (BaseOrderBook::isBuyersAvailable() === 1) {
+    if (BaseOrderBook::isBuyersAvailable() == 1) {
       double orderSellPrice = order.getPrice();
       int orderSellQuantity = order.getQuantity();
       OrderBookItem maxBuyOrderItem = BaseOrderBook::getMaxBuyOrderItem();
@@ -120,7 +124,7 @@ void BaseOrderBook::processOrder(Order &order) {
         } else if (orderSellQuantity < maxBuyOrderItem.getQty()) {
           BaseOrderBook::updateMaxBuyOrderItemQuantity(maxBuyOrderItem.getQty() - orderSellQuantity);
         } else {
-          // order.setQuantity(order.getQuantity() - maxBuyOrderItem.getQtty());
+          order.setQuantity(order.getQuantity() - maxBuyOrderItem.getQty());
           BaseOrderBook::removeMaxBuyOrderItem();
         }
       } else {

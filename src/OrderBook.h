@@ -19,13 +19,17 @@ class BaseOrderBook {
     OrderBookItem getMinSellOrderItem();
     void removeMaxBuyOrderItem();
     void removeMinSellOrderItem();
-    void updateMaxBuyOrderItemQuantity();
-    void updateMinSellOrderItemQuantity();
+    void updateMaxBuyOrderItemQuantity(int newQuantity);
+    void updateMinSellOrderItemQuantity(int newQuantity);
     bool isBuyersAvailable();
     bool isSellersAvailable();
     void printOrderBook();
     string &getInstrument();
     void processOrder(Order &order);
+  
+  // protected;
+  //   MaxHeap* getBuySide();
+  //   MaxHeap* getSellSide();
 
   private:
     MaxHeap* buySide;

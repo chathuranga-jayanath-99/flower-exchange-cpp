@@ -17,8 +17,10 @@ MaxHeap::MaxHeap() {
 };
 
 void MaxHeap::insert(OrderBookItem orderBookItem) {
+    cout << "insert max heap" << endl;
     heap.push_back(orderBookItem);
     push_heap(heap.begin(), heap.end());
+    cout << "finish insert max heap" << endl;
 };
 
 OrderBookItem MaxHeap::peek_top() {
