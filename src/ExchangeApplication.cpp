@@ -1,13 +1,32 @@
 #include "Order.h"
 #include "OrderEntry.h"
+#include <arpa/inet.h>
+#include <atomic>
+#include <condition_variable>
+#include <cstring>
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <sstream>
 #include <string>
+#include <thread>
+#include <unistd.h>
 #include <vector>
 
 using namespace std;
+
+const char MESSAGE_DELIMITER = '\n';
+
+std::string receivedBuffer; // Shared buffer to store received data
+std::mutex bufferMutex;     // Mutex to synchronize access to the shared buffer
+std::condition_variable
+    bufferCondition; // Condition variable to notify processing thread
+
+atomic<bool> shutDownFlag(false);
+
+vector<string> lines;
 
 vector<string> split(const string &str, char delimiter) {
     vector<string> tokens;
@@ -17,6 +36,64 @@ vector<string> split(const string &str, char delimiter) {
         tokens.push_back(token);
     }
     return tokens;
+}
+
+void receiveThread(int clientSocket) {
+
+    while (true) {
+        char chunk[4096];
+        ssize_t bytesRead = recv(clientSocket, chunk, sizeof(chunk), 0);
+
+        if (bytesRead > 0) {
+            // Lock the mutex before modifying the shared buffer
+            lock_guard<mutex> lock(bufferMutex);
+            receivedBuffer.append(chunk, bytesRead);
+
+            // Notify the processing thread that new data is available
+            bufferCondition.notify_one();
+
+        } else if (bytesRead == 0) {
+            cerr << "Connection closed by the server" << endl;
+            break;
+        } else if (errno != EWOULDBLOCK) {
+            cerr << "Error receiving data" << endl;
+            break;
+        }
+    }
+
+    bufferCondition.notify_one();
+}
+
+void processThread() {
+    while (true) {
+        // Lock the mutex before accessing the shared buffer
+        std::unique_lock<std::mutex> lock(bufferMutex);
+        // Wait until new data is available in the buffer
+        bufferCondition.wait(lock, [] {
+            return !receivedBuffer.empty() || shutDownFlag.load();
+            ;
+        });
+
+        if (shutDownFlag.load()) {
+            break;
+        }
+
+        // Process the data in the buffer
+        std::istringstream iss(receivedBuffer);
+        std::string message;
+        while (std::getline(iss, message, MESSAGE_DELIMITER)) {
+            // Perform processing tasks here
+            std::cout << " Processed message: " << message << std::endl;
+
+            lines.push_back(message);
+        }
+
+        // Clear the buffer for new data
+        receivedBuffer.clear();
+
+        // Unlock the mutex to allow the receive thread to modify the buffer
+        lock.unlock();
+    }
 }
 
 class ExchangeApplication {
@@ -85,29 +162,13 @@ class ExchangeApplication {
     }
 
     // This function is used to read the file
-    void readFile(vector<Order> &validOrders, vector<OrderEntry> &orderEntries,
+    void readFile(vector<string> &lines, vector<Order> &validOrders,
+                  vector<OrderEntry> &orderEntries,
                   map<string, string> &orderIDMap, int &orderCount) {
-        string filename;
 
-        cout << "Enter the name of the file you want to read: ";
-        cin >> filename;
+        for (string line : lines) {
 
-        string fullFileName = "./testcases/" + filename + ".csv";
-
-        ifstream file(fullFileName);
-
-        if (!file.is_open()) {
-            cerr << "Error opening file.\n";
-            return;
-        }
-
-        string header;
-        getline(file, header);
-
-        string line;
-        while (getline(file, line)) {
-
-            vector<string> tokens = split(line, ',');
+            vector<string> tokens = split(line, ' ');
 
             // std::cout << "Tokens: ";
             // for (const auto &token : tokens) {
@@ -136,7 +197,6 @@ class ExchangeApplication {
             }
         }
 
-        file.close();
         return;
     }
 
@@ -187,11 +247,70 @@ int main() {
     map<string, string> orderIDMap;
     int orderCount = 0;
 
-    ex_app.readFile(validOrders, orderEntries, orderIDMap, orderCount);
+    // Create a socket
+    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket == -1) {
+        std::cerr << "Error creating socket" << std::endl;
+        return -1;
+    }
+
+    // Bind the socket to a specific address and port
+    sockaddr_in serverAddr{};
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr =
+        INADDR_ANY; // Listen on any available interface
+    serverAddr.sin_port =
+        htons(12345); // Use a specific port (you can change this)
+
+    if (bind(serverSocket, (struct sockaddr *)&serverAddr,
+             sizeof(serverAddr)) == -1) {
+        std::cerr << "Error binding socket" << std::endl;
+        close(serverSocket);
+        return -1;
+    }
+
+    // Listen for incoming connections
+    if (listen(serverSocket, 5) == -1) {
+        std::cerr << "Error listening for connections" << std::endl;
+        close(serverSocket);
+        return -1;
+    }
+
+    std::cout << "Server listening for connections..." << std::endl;
+
+    // Accept a connection
+    sockaddr_in clientAddr{};
+    socklen_t clientAddrLen = sizeof(clientAddr);
+    int clientSocket =
+        accept(serverSocket, (struct sockaddr *)&clientAddr, &clientAddrLen);
+    if (clientSocket == -1) {
+        std::cerr << "Error accepting connection" << std::endl;
+        close(serverSocket);
+        return -1;
+    }
+
+    // Start the receive thread
+    std::thread receiveThreadObj(receiveThread, clientSocket);
+
+    // Start the process thread
+    std::thread processThreadObj(processThread);
+
+    // Wait for threads to finish
+    receiveThreadObj.join();
+    shutDownFlag.store(true);
+    bufferCondition.notify_one();
+    processThreadObj.join();
+
+    // Close the client socket when done
+    // close(clientSocket);
+
+    ex_app.readFile(lines, validOrders, orderEntries, orderIDMap, orderCount);
 
     for (auto &order : validOrders) {
         order.printOrder();
     }
 
     ex_app.writeFile(orderEntries);
+
+    return 0;
 }
