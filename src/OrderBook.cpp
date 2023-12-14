@@ -1,4 +1,5 @@
 #include "OrderBook.h"
+#include "Utils.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -44,8 +45,11 @@ void OrderBook::addOrderEntryToVector(vector<OrderEntry> &orderEntries,
                                       Order &order, ExecutionStatus execStatus,
                                       double price, int quantity) {
     OrderEntry *orderEntryPtr = new OrderEntry(
-        order.getOrderID(), order.getClientOrderId(), order.getInstrument(),
-        order.getSide(), execStatus, price, quantity, Reason::EMPTY);
+        order.getOrderID(), order.getClientOrderId(),
+        Utils::getStrFromInstrument(order.getInstrument()),
+        to_string(order.getSide()),
+        Utils::getStrFromExecutionStatus(execStatus), to_string(price),
+        to_string(quantity), Utils::getStrFromReason(Reason::EMPTY));
     orderEntries.push_back(*orderEntryPtr);
 }
 
@@ -69,8 +73,8 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                             processedOrderEntries, order, ExecutionStatus::FILL,
                             minSellOrder.getPrice(), order.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, minSellOrder, ExecutionStatus::FILL,
-                            minSellOrder.getPrice(),
+                            processedOrderEntries, minSellOrder,
+                            ExecutionStatus::FILL, minSellOrder.getPrice(),
                             minSellOrder.getQuantity());
                         break;
                     } else if (orderQty < minSellOrder.getQuantity()) {
@@ -80,8 +84,9 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                             processedOrderEntries, order, ExecutionStatus::FILL,
                             minSellOrder.getPrice(), order.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, minSellOrder, ExecutionStatus::PFILL,
-                            minSellOrder.getPrice(), order.getQuantity());
+                            processedOrderEntries, minSellOrder,
+                            ExecutionStatus::PFILL, minSellOrder.getPrice(),
+                            order.getQuantity());
                         break;
                     } else {
                         // update quantity
@@ -89,12 +94,12 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                                           minSellOrder.getQuantity());
                         OrderBook::removeMinSellOrder();
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, ExecutionStatus::PFILL,
-                            minSellOrder.getPrice(),
+                            processedOrderEntries, order,
+                            ExecutionStatus::PFILL, minSellOrder.getPrice(),
                             minSellOrder.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, minSellOrder, ExecutionStatus::FILL,
-                            minSellOrder.getPrice(),
+                            processedOrderEntries, minSellOrder,
+                            ExecutionStatus::FILL, minSellOrder.getPrice(),
                             minSellOrder.getQuantity());
                         orderPartialFilled = true;
                     }
@@ -103,8 +108,8 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                     OrderBook::addBuyOrder(order);
                     if (!orderPartialFilled) {
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, ExecutionStatus::NEW, order.getPrice(),
-                            order.getQuantity());
+                            processedOrderEntries, order, ExecutionStatus::NEW,
+                            order.getPrice(), order.getQuantity());
                     }
                     break;
                 }
@@ -112,9 +117,9 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                 // Enter order in buy side
                 OrderBook::addBuyOrder(order);
                 if (!orderPartialFilled) {
-                    OrderBook::addOrderEntryToVector(processedOrderEntries,
-                                                     order, ExecutionStatus::NEW, order.getPrice(),
-                                                     order.getQuantity());
+                    OrderBook::addOrderEntryToVector(
+                        processedOrderEntries, order, ExecutionStatus::NEW,
+                        order.getPrice(), order.getQuantity());
                 }
                 break;
             }
@@ -135,8 +140,9 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                             processedOrderEntries, order, ExecutionStatus::FILL,
                             maxBuyOrder.getPrice(), order.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, maxBuyOrder, ExecutionStatus::FILL,
-                            maxBuyOrder.getPrice(), order.getQuantity());
+                            processedOrderEntries, maxBuyOrder,
+                            ExecutionStatus::FILL, maxBuyOrder.getPrice(),
+                            order.getQuantity());
                         break;
                     } else if (orderSellQuantity < maxBuyOrder.getQuantity()) {
                         OrderBook::updateMaxBuyOrderQuantity(
@@ -145,19 +151,22 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                             processedOrderEntries, order, ExecutionStatus::FILL,
                             maxBuyOrder.getPrice(), order.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, maxBuyOrder, ExecutionStatus::PFILL,
-                            maxBuyOrder.getPrice(), order.getQuantity());
+                            processedOrderEntries, maxBuyOrder,
+                            ExecutionStatus::PFILL, maxBuyOrder.getPrice(),
+                            order.getQuantity());
                         break;
                     } else {
                         order.setQuantity(order.getQuantity() -
                                           maxBuyOrder.getQuantity());
                         OrderBook::removeMaxBuyOrder();
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, ExecutionStatus::PFILL,
-                            maxBuyOrder.getPrice(), maxBuyOrder.getQuantity());
+                            processedOrderEntries, order,
+                            ExecutionStatus::PFILL, maxBuyOrder.getPrice(),
+                            maxBuyOrder.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, maxBuyOrder, ExecutionStatus::FILL,
-                            maxBuyOrder.getPrice(), maxBuyOrder.getQuantity());
+                            processedOrderEntries, maxBuyOrder,
+                            ExecutionStatus::FILL, maxBuyOrder.getPrice(),
+                            maxBuyOrder.getQuantity());
                         orderPartialFilled = true;
                     }
                 } else {
@@ -165,8 +174,8 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                     OrderBook::addSellOrder(order);
                     if (!orderPartialFilled) {
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, ExecutionStatus::NEW, order.getPrice(),
-                            order.getQuantity());
+                            processedOrderEntries, order, ExecutionStatus::NEW,
+                            order.getPrice(), order.getQuantity());
                     }
                     break;
                 }
@@ -174,9 +183,9 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                 // Enter order in sell side
                 OrderBook::addSellOrder(order);
                 if (!orderPartialFilled) {
-                    OrderBook::addOrderEntryToVector(processedOrderEntries,
-                                                     order, ExecutionStatus::NEW, order.getPrice(),
-                                                     order.getQuantity());
+                    OrderBook::addOrderEntryToVector(
+                        processedOrderEntries, order, ExecutionStatus::NEW,
+                        order.getPrice(), order.getQuantity());
                 }
                 break;
             }

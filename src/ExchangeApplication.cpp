@@ -1,8 +1,8 @@
+#include "./enums/Instrument.h"
+#include "Constants.h"
 #include "Order.h"
 #include "OrderBook.h"
 #include "OrderEntry.h"
-#include "./enums/Instrument.h"
-#include "Constants.h"
 #include "Utils.h"
 #include <arpa/inet.h>
 #include <atomic>
@@ -155,6 +155,7 @@ class ExchangeApplication {
         int token_count = 0;
         for (auto &token : tokens) {
             if (token == "") {
+                cout << "Empty" << endl;
                 result[0] = 0;
                 result[1] = 0;
                 result[2] = token_count;
@@ -214,27 +215,25 @@ class ExchangeApplication {
     void readLine(string &line, vector<OrderEntry> &orderEntries,
                   map<string, string> &orderIDMap, int &orderCount) {
 
-        vector<string> tokens = split(line, ' ');
+        vector<string> tokens = split(line, ',');
 
-        // cout << "Tokens: ";
-        // for (const auto &token : tokens) {
-        //   cout << token << " ";
-        // }
-        // cout << endl;
+        cout << "Tokens: ";
+        for (const auto &token : tokens) {
+            cout << token << " ";
+        }
+        cout << endl;
 
         string orderID = orderIdGenerator(orderIDMap, tokens[0], orderCount);
 
         int *result = filterTokens(tokens);
 
         if (result[0] == 0) {
-            if (result[1] != 0) {
-                string reasonStr = Utils::getReasonStrFromErrorCode(result[1]);
-                OrderEntry orderEntry(orderID, tokens[0], tokens[1],
-                                      stoi(tokens[2]), Constants::REJECTED, stod(tokens[3]),
-                                      stoi(tokens[4]), reasonStr);
-                orderEntries.push_back(orderEntry);
-            } else {
-            }
+            string reasonStr = Utils::getReasonStrFromErrorCode(result[1]);
+            OrderEntry orderEntry(orderID, tokens[0], tokens[1], tokens[2],
+                                  Constants::REJECTED, tokens[3], tokens[4],
+                                  reasonStr);
+            orderEntries.push_back(orderEntry);
+
         } else {
             Instrument instrument = getInstrumentFromString(tokens[1]);
             Order order(orderID, tokens[0], instrument, stoi(tokens[2]),
@@ -290,10 +289,9 @@ class ExchangeApplication {
         for (auto &orderEntry : orderEntries) {
             file << orderEntry.getOrderID() << ","
                  << orderEntry.getClientOrderId() << ","
-                 << orderEntry.getInstrument() << ","
-                 << to_string(orderEntry.getSide()) << ","
-                 << orderEntry.getExecStatus() << ","
-                 << to_string(orderEntry.getQuantity()) << "," << std::fixed
+                 << orderEntry.getInstrument() << "," << orderEntry.getSide()
+                 << "," << orderEntry.getQuantity() << ","
+                 << orderEntry.getExecStatus() << "," << std::fixed
                  << std::setprecision(2) << orderEntry.getPrice() << ","
                  << orderEntry.getReason() << "," << orderEntry.getTimestamp()
                  << "\n";

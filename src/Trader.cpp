@@ -30,7 +30,7 @@ void publishVector(const std::vector<string> &data, int clientSocket) {
     // Serialize vector into a string
     std::string serializedData;
     for (const auto &element : data) {
-        serializedData += element + ' ';
+        serializedData += element + ',';
     }
     serializedData += MESSAGE_DELIMITER;
 
@@ -66,6 +66,12 @@ class Trader {
 
         string line;
         while (getline(file, line)) {
+
+            cout << line << endl;
+
+            if (!line.empty() && line[line.length() - 1] == '\r') {
+                line.erase(line.length() - 1);
+            }
 
             vector<string> tokens = split(line, ',');
             lines.push_back(tokens);
