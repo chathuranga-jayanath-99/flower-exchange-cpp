@@ -10,7 +10,7 @@ using namespace std;
 
 class OrderBook {
   public:
-    OrderBook();
+    OrderBook(string instrument);
     ~OrderBook();
     void addOrder(const string &clientOrderIdPtr, const string &instrumentPtr,
                   int side, double price, int quantity);
@@ -36,6 +36,7 @@ class OrderBook {
   private:
     MaxHeap* buySide;
     MinHeap* sellSide;
+    string instrument;
 };
 
 #endif

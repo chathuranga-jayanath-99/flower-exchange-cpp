@@ -5,9 +5,10 @@
 
 using namespace std;
 
-OrderBook::OrderBook() {
+OrderBook::OrderBook(string instrument) {
   buySide = new MaxHeap();
   sellSide = new MinHeap();
+  this->instrument = instrument;
 }
 
 OrderBook::~OrderBook() {

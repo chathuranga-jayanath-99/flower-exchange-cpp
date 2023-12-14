@@ -11,7 +11,7 @@ using namespace std;
 int main() {
   vector<OrderEntry> completeReport;  
   vector<OrderEntry> orderEntries;  
-  RoseOrderBook rob;
+  OrderBook rob("ROSE");
   cout << rob.isBuyersAvailable() << endl;
   
   Order o1("","aa13","rose",2,55,100);
