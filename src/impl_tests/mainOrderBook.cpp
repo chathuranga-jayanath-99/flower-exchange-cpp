@@ -1,6 +1,7 @@
 #include "../Heap.h"
 #include "../Order.h"
 #include "../OrderBook.h"
+#include "../OrderEntry.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -8,11 +9,11 @@
 using namespace std;
 
 int main() {
-  cout << "statr main order book" << endl;
+  vector<OrderEntry> completeReport;  
+  vector<OrderEntry> orderEntries;  
   RoseOrderBook rob;
   cout << rob.isBuyersAvailable() << endl;
   
-  cout << "define orders" << endl;
   // 2 sell orders followed with buy
   // Order o1("a1","c1","rose",2,55,100);
   // Order o2("a2","c2","rose",2,45,150);
@@ -27,18 +28,47 @@ int main() {
   Order o1("a1","c1","rose",1,55,100);
   Order o2("a2","c2","rose",1,45,150);
   Order o3("a3","c3","rose",2,45,200);
+  
+  orderEntries = rob.processOrder(o1);
+  for (size_t i = 0; i < orderEntries.size(); i++)
+  {
+    completeReport.push_back(orderEntries[i]);
+  }
+  
+  orderEntries = rob.processOrder(o2);
+  for (size_t i = 0; i < orderEntries.size(); i++)
+  {
+    completeReport.push_back(orderEntries[i]);
+  }
+  orderEntries = rob.processOrder(o3);
+  for (size_t i = 0; i < orderEntries.size(); i++)
+  {
+    completeReport.push_back(orderEntries[i]);
+  }
 
-  cout << "add orders to order book" << endl;
-  rob.processOrder(o1);
-  rob.processOrder(o2);
-  rob.processOrder(o3);
-
-  cout << "after buy" << endl;
+  cout << "Print Order Book" << endl;
+  cout << "==========================" << endl;
   cout << "buy side" << endl;
-  cout << rob.getMaxBuyOrder().getOrderID() << " | " << rob.getMaxBuyOrder().getQuantity() << endl;
+  if (rob.isBuyersAvailable()) {
+    cout << rob.getMaxBuyOrder().getOrderID() << " | " << rob.getMaxBuyOrder().getQuantity() << endl;
+  } else {
+    cout << "empty" << endl;
+  }
 
   cout << "sell side" << endl;
-  cout << rob.getMinSellOrder().getOrderID() << " | " << rob.getMinSellOrder().getQuantity() << endl;
-  
+  if (rob.isSellersAvailable()) {
+    cout << rob.getMinSellOrder().getOrderID() << " | " << rob.getMinSellOrder().getQuantity() << endl;
+  } else {
+    cout << "empty" << endl;
+  }
+
+  cout << endl;
+  cout << endl;
+  cout << "execution report";
+  cout << "==========================" << endl;
+  for (size_t i = 0; i < completeReport.size(); i++)
+  {
+    completeReport[i].printOrderEntry();
+  }
   return 0;
 }

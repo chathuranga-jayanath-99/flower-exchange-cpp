@@ -75,7 +75,23 @@ OrchidOrderBook::OrchidOrderBook() : BaseOrderBook() {
     
 }
 
-void BaseOrderBook::processOrder(Order &order) {
+void BaseOrderBook::addOrderEntryToVector(vector<OrderEntry> &orderEntries, Order &order, int statusCode, double price, int quantity) {
+  OrderEntry* orderEntryPtr = new OrderEntry(
+    order.getOrderID(),
+    order.getClientOrderId(),
+    order.getInstrument(),
+    order.getSide(),
+    statusCode,
+    price,
+    quantity,
+    -1
+  );
+  orderEntries.push_back(*orderEntryPtr);
+}
+
+vector<OrderEntry> BaseOrderBook::processOrder(Order &order) {
+  vector<OrderEntry> processedOrderEntries;
+  bool orderPartialFilled = false;
   if (order.getSide() == 1) {
     // Processing buy side logic
     while (true)
@@ -90,25 +106,38 @@ void BaseOrderBook::processOrder(Order &order) {
           if (orderQty == minSellOrder.getQuantity()) {
             // remove sell order
             BaseOrderBook::removeMinSellOrder();
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 2, minSellOrder.getPrice(), order.getQuantity());
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, minSellOrder, 2, minSellOrder.getPrice(), minSellOrder.getQuantity());
             break;
           } 
           else if (orderQty < minSellOrder.getQuantity()) {
             BaseOrderBook::updateMinSellOrderQuantity(minSellOrder.getQuantity() - orderQty);
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 2, minSellOrder.getPrice(), order.getQuantity());
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, minSellOrder, 3, minSellOrder.getPrice(), order.getQuantity());
             break;
           } 
           else {
             // update quantity
             order.setQuantity(order.getQuantity() - minSellOrder.getQuantity());
             BaseOrderBook::removeMinSellOrder();
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 3, minSellOrder.getPrice(), minSellOrder.getQuantity());
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, minSellOrder, 2, minSellOrder.getPrice(), minSellOrder.getQuantity());
+            orderPartialFilled = true;
           }
         } else {
           // Enter order in buy side 
           BaseOrderBook::addBuyOrder(order);
+          if (!orderPartialFilled) {
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 0, order.getPrice(), order.getQuantity());
+          }
           break;
         }
       } else {
         // Enter order in buy side 
         BaseOrderBook::addBuyOrder(order);
+        if (!orderPartialFilled) {
+          BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 0, order.getPrice(), order.getQuantity());
+        }
         break;
       }
     }
@@ -119,34 +148,46 @@ void BaseOrderBook::processOrder(Order &order) {
       if (BaseOrderBook::isBuyersAvailable() == 1) {
         double orderSellPrice = order.getPrice();
         int orderSellQuantity = order.getQuantity();
-        Order maxBuyOrderItem = BaseOrderBook::getMaxBuyOrder();
-        if (maxBuyOrderItem.getPrice() >= orderSellPrice) {
-          // sell for maxBuyOrderItem price 
+        Order maxBuyOrder = BaseOrderBook::getMaxBuyOrder();
+        if (maxBuyOrder.getPrice() >= orderSellPrice) {
+          // sell for maxBuyOrder price 
           // check available quantity
-          if (orderSellQuantity == maxBuyOrderItem.getQuantity()) {
+          if (orderSellQuantity == maxBuyOrder.getQuantity()) {
             BaseOrderBook::removeMaxBuyOrder();
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 2, maxBuyOrder.getPrice(), order.getQuantity());
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, maxBuyOrder, 2, maxBuyOrder.getPrice(), order.getQuantity());
             break;
-          } else if (orderSellQuantity < maxBuyOrderItem.getQuantity()) {
-            BaseOrderBook::updateMaxBuyOrderQuantity(maxBuyOrderItem.getQuantity() - orderSellQuantity);
+          } else if (orderSellQuantity < maxBuyOrder.getQuantity()) {
+            BaseOrderBook::updateMaxBuyOrderQuantity(maxBuyOrder.getQuantity() - orderSellQuantity);
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 2, maxBuyOrder.getPrice(), order.getQuantity());
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, maxBuyOrder, 3, maxBuyOrder.getPrice(), order.getQuantity());
             break;
           } else {
-            order.setQuantity(order.getQuantity() - maxBuyOrderItem.getQuantity());
+            order.setQuantity(order.getQuantity() - maxBuyOrder.getQuantity());
             BaseOrderBook::removeMaxBuyOrder();
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 3, maxBuyOrder.getPrice(), maxBuyOrder.getQuantity());
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, maxBuyOrder, 2, maxBuyOrder.getPrice(), maxBuyOrder.getQuantity());
+            orderPartialFilled = true;
           }
         } else {
           // Enter order in sell side 
           BaseOrderBook::addSellOrder(order);
+          if (!orderPartialFilled) {
+            BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 0, order.getPrice(), order.getQuantity());
+          }
           break;
         }
       } else {
         // Enter order in sell side 
         BaseOrderBook::addSellOrder(order);
+        if (!orderPartialFilled) {
+          BaseOrderBook::addOrderEntryToVector(processedOrderEntries, order, 0, order.getPrice(), order.getQuantity());
+        }
         break;
       }
     }
-    
-    
   } else {
     // Invalid order side
   }
+  return processedOrderEntries;
 }

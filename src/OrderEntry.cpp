@@ -47,13 +47,13 @@ OrderEntry::OrderEntry(const string &orderIDPtr, const string &clientOrderIdPtr,
 };
 
 void OrderEntry::printOrderEntry() {
-  cout << "Order ID: " << orderID << endl;
-  cout << "Client Order ID: " << clientOrderId << endl;
-  cout << "Instrument: " << instrument << endl;
-  cout << "Side: " << side << endl;
-  cout << "Exec Status: " << execStatus << endl;
-  cout << "Price: " << price << endl;
-  cout << "Quantity: " << quantity << endl;
+  cout << "Order ID: " << orderID << "| ";
+  cout << "Client Order ID: " << clientOrderId << "| ";
+  cout << "Instrument: " << instrument << "| ";
+  cout << "Side: " << side << "| ";
+  cout << "Exec Status: " << execStatus << "| ";
+  cout << "Price: " << price << "| ";
+  cout << "Quantity: " << quantity << "| ";
   cout << "Reason: " << reason << endl;
 }
 
