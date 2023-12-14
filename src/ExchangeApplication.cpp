@@ -1,8 +1,8 @@
+#include "./enums/Instrument.h"
+#include "Constants.h"
 #include "Order.h"
 #include "OrderBook.h"
 #include "OrderEntry.h"
-#include "./enums/Instrument.h"
-#include "Constants.h"
 #include "Utils.h"
 #include <arpa/inet.h>
 #include <atomic>
@@ -10,6 +10,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <mutex>
@@ -48,7 +49,6 @@ class ExchangeApplication {
     thread receiveThreadObj;
     thread processThreadObj;
 
-    vector<Order> validOrders;
     vector<OrderEntry> orderEntries;
     map<string, string> orderIDMap;
     int orderCount = 1;
@@ -63,6 +63,7 @@ class ExchangeApplication {
     static ExchangeApplication &getInstance(int clientSocket);
 
     void start(int clientSocket) {
+
         receiveThreadObj =
             std::thread(&ExchangeApplication::receiveThread, this);
         processThreadObj =
@@ -120,8 +121,7 @@ class ExchangeApplication {
             while (getline(iss, message, MESSAGE_DELIMITER)) {
                 // Perform processing tasks here
                 cout << " Processed message: " << message << endl;
-                readLine(message, validOrders, orderEntries, orderIDMap,
-                         orderCount);
+                readLine(message, orderEntries, orderIDMap, orderCount);
                 // lines.push_back(message);
             }
 
@@ -155,6 +155,7 @@ class ExchangeApplication {
         int token_count = 0;
         for (auto &token : tokens) {
             if (token == "") {
+                cout << "Empty" << endl;
                 result[0] = 0;
                 result[1] = 0;
                 result[2] = token_count;
@@ -211,31 +212,28 @@ class ExchangeApplication {
     }
 
     // This function is used to read the file
-    void readLine(string &line, vector<Order> &validOrders,
-                  vector<OrderEntry> &orderEntries,
+    void readLine(string &line, vector<OrderEntry> &orderEntries,
                   map<string, string> &orderIDMap, int &orderCount) {
 
-        vector<string> tokens = split(line, ' ');
+        vector<string> tokens = split(line, ',');
 
-        // cout << "Tokens: ";
-        // for (const auto &token : tokens) {
-        //   cout << token << " ";
-        // }
-        // cout << endl;
+        cout << "Tokens: ";
+        for (const auto &token : tokens) {
+            cout << token << " ";
+        }
+        cout << endl;
 
         string orderID = orderIdGenerator(orderIDMap, tokens[0], orderCount);
 
         int *result = filterTokens(tokens);
 
         if (result[0] == 0) {
-            if (result[1] != 0) {
-                string reasonStr = Utils::getReasonStrFromErrorCode(result[1]);
-                OrderEntry orderEntry(orderID, tokens[0], tokens[1],
-                                      stoi(tokens[2]), Constants::REJECTED, stod(tokens[3]),
-                                      stoi(tokens[4]), reasonStr);
-                orderEntries.push_back(orderEntry);
-            } else {
-            }
+            string reasonStr = Utils::getReasonStrFromErrorCode(result[1]);
+            OrderEntry orderEntry(orderID, tokens[0], tokens[1], tokens[2],
+                                  Constants::REJECTED, tokens[3], tokens[4],
+                                  reasonStr);
+            orderEntries.push_back(orderEntry);
+
         } else {
             Instrument instrument = getInstrumentFromString(tokens[1]);
             Order order(orderID, tokens[0], instrument, stoi(tokens[2]),
@@ -267,8 +265,53 @@ class ExchangeApplication {
         }
     }
 
-    vector<Order> getValidOrders() { return validOrders; }
+    void writeFile() {
+
+        string filename;
+
+        cout << "Enter the name of the file you want to write: ";
+        cin >> filename;
+
+        string fullFileName = "./results/result" + filename + ".csv";
+        // string fullFileName = "./results/result7.csv";
+
+        ofstream file(fullFileName);
+
+        if (!file.is_open()) {
+            cerr << "Error opening file.\n";
+            return;
+        }
+
+        file << "OrderID,ClientOrderID,Instrument,Side,ExecStatus,Quantity,"
+                "Price,"
+                "Reason,Timestamp\n";
+
+        for (auto &orderEntry : orderEntries) {
+            file << orderEntry.getOrderID() << ","
+                 << orderEntry.getClientOrderId() << ","
+                 << orderEntry.getInstrument() << "," << orderEntry.getSide()
+                 << "," << orderEntry.getQuantity() << ","
+                 << orderEntry.getExecStatus() << "," << std::fixed
+                 << std::setprecision(2) << orderEntry.getPrice() << ","
+                 << orderEntry.getReason() << "," << orderEntry.getTimestamp()
+                 << "\n";
+        }
+
+        file.close();
+        return;
+    }
+
     vector<OrderEntry> getOrderEntries() { return orderEntries; }
+
+    void setOrderEntries(vector<OrderEntry> orderEntries) {
+        this->orderEntries = orderEntries;
+    }
+
+    void setOrderIDMap(map<string, string> orderIDMap) {
+        this->orderIDMap = orderIDMap;
+    }
+
+    void setOrderCount(int orderCount) { this->orderCount = orderCount; }
 };
 
 ExchangeApplication &ExchangeApplication::getInstance(int clientSocket) {
@@ -326,17 +369,15 @@ int main() {
 
     ExchangeApplication &ex_app =
         ExchangeApplication::getInstance(clientSocket);
-    ex_app.start(clientSocket);
 
-    cout << "Valid Orders: " << endl;
-    for (auto &order : ex_app.getValidOrders()) {
-        order.printOrder();
-    }
+    ex_app.start(clientSocket);
 
     cout << "Order Entries: " << endl;
     for (auto &orderEntry : ex_app.getOrderEntries()) {
         orderEntry.printOrderEntry();
     }
+
+    ex_app.writeFile();
 
     return 0;
 }

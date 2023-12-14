@@ -30,7 +30,7 @@ void publishVector(const std::vector<string> &data, int clientSocket) {
     // Serialize vector into a string
     std::string serializedData;
     for (const auto &element : data) {
-        serializedData += element + ' ';
+        serializedData += element + ',';
     }
     serializedData += MESSAGE_DELIMITER;
 
@@ -46,13 +46,13 @@ class Trader {
 
     // This function is used to read the file
     void readFile(vector<vector<string>> &lines) {
-        // string filename;
+        string filename;
 
-        // cout << "Enter the name of the file you want to read: ";
-        // cin >> filename;
+        cout << "Enter the name of the file you want to read: ";
+        cin >> filename;
 
-        // string fullFileName = "./testcases/" + filename + ".csv";
-        string fullFileName = "./testcases/example2.csv";
+        string fullFileName = "./testcases/example" + filename + ".csv";
+        // string fullFileName = "./testcases/example7.csv";
 
         ifstream file(fullFileName);
 
@@ -66,6 +66,12 @@ class Trader {
 
         string line;
         while (getline(file, line)) {
+
+            cout << line << endl;
+
+            if (!line.empty() && line[line.length() - 1] == '\r') {
+                line.erase(line.length() - 1);
+            }
 
             vector<string> tokens = split(line, ',');
             lines.push_back(tokens);
