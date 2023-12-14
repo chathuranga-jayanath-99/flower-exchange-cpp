@@ -2,12 +2,12 @@
 #include <iostream>
 #include <string>
 
-Order::Order(const string &orderID, const string &clientOrderIdPtr,
-             const string &instrumentPtr, int side, double price,
+Order::Order(const string &orderID, const string &clientOrderId,
+             const Instrument &instrument, int side, double price,
              int quantity) {
     this->orderID = orderID;
-    this->clientOrderId = clientOrderIdPtr;
-    this->instrument = instrumentPtr;
+    this->clientOrderId = clientOrderId;
+    this->instrument = instrument;
     this->side = side;
     this->price = price;
     this->quantity = quantity;
@@ -24,7 +24,7 @@ void Order::printOrder() {
 
 string Order::getOrderID() { return this->orderID; };
 string Order::getClientOrderId() { return this->clientOrderId; };
-string Order::getInstrument() { return this->instrument; };
+Instrument Order::getInstrument() { return this->instrument; };
 int Order::getSide() { return this->side; };
 double Order::getPrice() { return this->price; };
 int Order::getQuantity() { return this->quantity; };

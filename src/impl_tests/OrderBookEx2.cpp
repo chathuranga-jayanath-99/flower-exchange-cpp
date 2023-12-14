@@ -2,6 +2,7 @@
 #include "../Order.h"
 #include "../OrderBook.h"
 #include "../OrderEntry.h"
+#include "../enums/Instrument.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -10,11 +11,11 @@ using namespace std;
 
 int main() {
   vector<OrderEntry> completeReport;  
-  OrderBook rob("ROSE");
+  OrderBook rob(Instrument::ROSE);
   
-  Order o1("","aa13","rose",2,55,100);
-  Order o2("","aa14","rose",2,45,100);
-  Order o3("","aa15","rose",1,35,100);
+  Order o1("","aa13",Instrument::ROSE,2,55,100);
+  Order o2("","aa14",Instrument::ROSE,2,45,100);
+  Order o3("","aa15",Instrument::ROSE,1,35,100);
   
   vector<OrderEntry> orderEntries1 = rob.processOrder(o1);
   for (size_t i = 0; i < orderEntries1.size(); i++)

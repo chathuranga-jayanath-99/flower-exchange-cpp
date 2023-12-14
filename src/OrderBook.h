@@ -3,6 +3,8 @@
 
 #include "Heap.h"
 #include "Order.h"
+#include "./enums/Instrument.h"
+#include "./enums/ExecutionStatus.h"
 #include "OrderEntry.h"
 #include <iostream>
 
@@ -10,16 +12,8 @@ using namespace std;
 
 class OrderBook {
   public:
-    OrderBook(string instrument);
+    OrderBook(Instrument instrument);
     ~OrderBook();
-    void addOrder(const string &clientOrderIdPtr, const string &instrumentPtr,
-                  int side, double price, int quantity);
-    void modifyOrder(const string &clientOrderIdPtr,
-                     const string &instrumentPtr, int side, double price,
-                     int quantity);
-    void cancelOrder(const string &clientOrderIdPtr,
-                     const string &instrumentPtr, int side, double price,
-                     int quantity);
     void addBuyOrder(Order &order);
     void addSellOrder(Order &order);
     Order getMaxBuyOrder();
@@ -34,12 +28,12 @@ class OrderBook {
     string &getInstrument();
     vector<OrderEntry> processOrder(Order &order);
     void addOrderEntryToVector(vector<OrderEntry> &orderEntries, Order &order,
-                               int statusCode, double price, int quantity);
+                               ExecutionStatus execStatus, double price, int quantity);
 
   private:
     MaxHeap *buySide;
     MinHeap *sellSide;
-    string instrument;
+    Instrument instrument;
 };
 
 #endif
