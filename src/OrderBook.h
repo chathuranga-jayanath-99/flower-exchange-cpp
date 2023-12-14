@@ -3,6 +3,7 @@
 
 #include "Heap.h"
 #include "Order.h"
+#include "OrderEntry.h"
 #include <iostream>
 
 using namespace std;
@@ -29,7 +30,8 @@ class BaseOrderBook {
     bool isSellersAvailable();
     void printOrderBook();
     string &getInstrument();
-    void processOrder(Order &order);
+    vector<OrderEntry> processOrder(Order &order);
+    void addOrderEntryToVector(vector<OrderEntry> &orderEntries, Order &order, int statusCode, double price, int quantity);
   
   private:
     MaxHeap* buySide;
