@@ -1,0 +1,12 @@
+#ifndef REJECTED_REASON_H
+#define REJECTED_REASON_H 
+
+enum Reason {
+    INVALID_INSTRUMENT,
+    INVALID_SIDE,
+    INVALID_PRICE,
+    INVALID_SIZE,
+    EMPTY
+};
+
+#endif

@@ -1,49 +1,35 @@
+#include "Utils.h"
 #include "OrderEntry.h"
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-OrderEntry::OrderEntry(const string &orderIDPtr, const string &clientOrderIdPtr,
-                       const string &instrumentPtr, int side,
-                       int execStatusCode, double price, int quantity,
-                       int reasonCode) {
-  orderID = orderIDPtr;
-  clientOrderId = clientOrderIdPtr;
-  instrument = instrumentPtr;
+OrderEntry::OrderEntry(const string &orderID, const string &clientOrderId,
+                       const Instrument &instrument, int side,
+                       ExecutionStatus execStatus, double price, int quantity,
+                       Reason reason) {
+  this->orderID = orderID;
+  this->clientOrderId = clientOrderId;
   this->side = side;
   this->price = price;
   this->quantity = quantity;
+  this->instrument = Utils::getStrFromInstrument(instrument);
+  this->execStatus = Utils::getStrFromExecutionStatus(execStatus);
+  this->reason = Utils::getStrFromReason(reason);
+};
 
-  switch (execStatusCode) {
-  case 0:
-    execStatus = "New";
-    break;
-  case 1:
-    execStatus = "Rejected";
-    break;
-  case 2:
-    execStatus = "Fill";
-    break;
-  case 3:
-    execStatus = "Pfill";
-    break;
-  }
-
-  switch (reasonCode) {
-  case 0:
-    reason = "Invalid instrument";
-    break;
-  case 1:
-    reason = "Invalid side";
-    break;
-  case 2:
-    reason = "Invalid price";
-    break;
-  case 3:
-    reason = "Invalid size";
-    break;
-  }
+OrderEntry::OrderEntry(const string &orderID, const string &clientOrderId,
+                      const string &instrument, const int side, string execStatus,
+                      double price, int quantity, string reason) {
+  this->orderID = orderID;
+  this->clientOrderId = clientOrderId;
+  this->side = side;
+  this->price = price;
+  this->quantity = quantity;
+  this->instrument = instrument; 
+  this->execStatus = execStatus;
+  this->reason = reason;
 };
 
 void OrderEntry::printOrderEntry() {

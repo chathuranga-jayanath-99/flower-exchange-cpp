@@ -1,6 +1,9 @@
 #ifndef ORDER_ENTRY_H 
 #define ORDER_ENTRY_H
 
+#include "./enums/Instrument.h"
+#include "./enums/ExecutionStatus.h"
+#include "./enums/Reason.h"
 #include <string>
 
 using namespace std;
@@ -17,9 +20,12 @@ private:
   string reason;
 
 public:
-  OrderEntry(const string &orderIDPtr, const string &clientOrderIdPtr,
-             const string &instrumentPtr, const int side, int execStatusCode,
-             double price, int quantity, int reasonCode);
+  OrderEntry(const string &orderID, const string &clientOrderId,
+             const Instrument &instrument, const int side, ExecutionStatus execStatus,
+             double price, int quantity, Reason reason);
+  OrderEntry(const string &orderID, const string &clientOrderId,
+             const string &instrument, const int side, string execStatus,
+             double price, int quantity, string reason);
   void printOrderEntry();
   string getOrderID();
   string getClientOrderId();

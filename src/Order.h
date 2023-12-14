@@ -1,6 +1,7 @@
 #ifndef ORDER_H 
 #define ORDER_H
 
+#include "./enums/Instrument.h"
 #include <string>
 
 using namespace std;
@@ -9,18 +10,18 @@ class Order {
   private:
     string orderID;
     string clientOrderId;
-    string instrument;
+    Instrument instrument;
     int side;
     double price;
     int quantity;
 
   public:
     Order(const string &orderID, const string &clientOrderIdPtr,
-          const string &instrumentPtr, int side, double price, int quantity);
+          const Instrument &instrumentPtr, int side, double price, int quantity);
     void printOrder();
     string getOrderID();
     string getClientOrderId();
-    string getInstrument();
+    Instrument getInstrument();
     int getSide();
     double getPrice();
     int getQuantity();
