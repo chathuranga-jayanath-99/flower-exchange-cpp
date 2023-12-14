@@ -7,6 +7,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <mutex>
@@ -45,7 +46,6 @@ class ExchangeApplication {
     thread receiveThreadObj;
     thread processThreadObj;
 
-    vector<Order> validOrders;
     vector<OrderEntry> orderEntries;
     map<string, string> orderIDMap;
     int orderCount = 1;
@@ -60,6 +60,7 @@ class ExchangeApplication {
     static ExchangeApplication &getInstance(int clientSocket);
 
     void start(int clientSocket) {
+
         receiveThreadObj =
             std::thread(&ExchangeApplication::receiveThread, this);
         processThreadObj =
@@ -117,8 +118,7 @@ class ExchangeApplication {
             while (getline(iss, message, MESSAGE_DELIMITER)) {
                 // Perform processing tasks here
                 cout << " Processed message: " << message << endl;
-                readLine(message, validOrders, orderEntries, orderIDMap,
-                         orderCount);
+                readLine(message, orderEntries, orderIDMap, orderCount);
                 // lines.push_back(message);
             }
 
@@ -192,8 +192,7 @@ class ExchangeApplication {
     }
 
     // This function is used to read the file
-    void readLine(string &line, vector<Order> &validOrders,
-                  vector<OrderEntry> &orderEntries,
+    void readLine(string &line, vector<OrderEntry> &orderEntries,
                   map<string, string> &orderIDMap, int &orderCount) {
 
         vector<string> tokens = split(line, ' ');
@@ -246,8 +245,53 @@ class ExchangeApplication {
         }
     }
 
-    vector<Order> getValidOrders() { return validOrders; }
+    void writeFile() {
+
+        string filename;
+
+        cout << "Enter the name of the file you want to write: ";
+        cin >> filename;
+
+        string fullFileName = "./results/result" + filename + ".csv";
+        // string fullFileName = "./results/result7.csv";
+
+        ofstream file(fullFileName);
+
+        if (!file.is_open()) {
+            cerr << "Error opening file.\n";
+            return;
+        }
+
+        file << "OrderID,ClientOrderID,Instrument,Side,ExecStatus,Quantity,"
+                "Price,"
+                "Reason\n";
+
+        for (auto &orderEntry : orderEntries) {
+            file << orderEntry.getOrderID() << ","
+                 << orderEntry.getClientOrderId() << ","
+                 << orderEntry.getInstrument() << ","
+                 << to_string(orderEntry.getSide()) << ","
+                 << orderEntry.getExecStatus() << ","
+                 << to_string(orderEntry.getQuantity()) << "," << std::fixed
+                 << std::setprecision(2) << orderEntry.getPrice() << ","
+                 << orderEntry.getReason() << "\n";
+        }
+
+        file.close();
+        return;
+    }
+
     vector<OrderEntry> getOrderEntries() { return orderEntries; }
+
+    void setOrderEntries(vector<OrderEntry> orderEntries) {
+        this->orderEntries = orderEntries;
+    }
+
+    void setOrderIDMap(map<string, string> orderIDMap) {
+        this->orderIDMap = orderIDMap;
+    }
+
+    void setOrderCount(int orderCount) { this->orderCount = orderCount; }
 };
 
 ExchangeApplication &ExchangeApplication::getInstance(int clientSocket) {
@@ -305,17 +349,15 @@ int main() {
 
     ExchangeApplication &ex_app =
         ExchangeApplication::getInstance(clientSocket);
-    ex_app.start(clientSocket);
 
-    cout << "Valid Orders: " << endl;
-    for (auto &order : ex_app.getValidOrders()) {
-        order.printOrder();
-    }
+    ex_app.start(clientSocket);
 
     cout << "Order Entries: " << endl;
     for (auto &orderEntry : ex_app.getOrderEntries()) {
         orderEntry.printOrderEntry();
     }
+
+    ex_app.writeFile();
 
     return 0;
 }

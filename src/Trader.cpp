@@ -46,13 +46,13 @@ class Trader {
 
     // This function is used to read the file
     void readFile(vector<vector<string>> &lines) {
-        // string filename;
+        string filename;
 
-        // cout << "Enter the name of the file you want to read: ";
-        // cin >> filename;
+        cout << "Enter the name of the file you want to read: ";
+        cin >> filename;
 
-        // string fullFileName = "./testcases/" + filename + ".csv";
-        string fullFileName = "./testcases/example2.csv";
+        string fullFileName = "./testcases/example" + filename + ".csv";
+        // string fullFileName = "./testcases/example7.csv";
 
         ifstream file(fullFileName);
 
