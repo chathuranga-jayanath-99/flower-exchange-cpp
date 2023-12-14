@@ -1,4 +1,4 @@
-OrderID,ClientOrderID,Instrument,Side,ExecStatus,Quantity,Price,Reason
-ord1,aa13,Rose,2,New,100,55.00,
-ord2,aa14,Rose,2,New,100,45.00,
-ord3,aa15,Rose,1,New,100,35.00,
+OrderID,ClientOrderID,Instrument,Side,ExecStatus,Quantity,Price,Reason,Timestamp
+ord1,aa13,Rose,2,100,New,55.000000,,20231214-232640.204235
+ord2,aa14,Rose,2,100,New,45.000000,,20231214-232640.204390
+ord3,aa15,Rose,1,100,New,35.000000,,20231214-232640.204449
