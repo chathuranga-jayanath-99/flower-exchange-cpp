@@ -1,3 +1,6 @@
+#ifndef ORDER_ENTRY_H 
+#define ORDER_ENTRY_H
+
 #include <string>
 
 using namespace std;
@@ -27,3 +30,5 @@ public:
   int getQuantity();
   string getReason();
 };
+
+#endif

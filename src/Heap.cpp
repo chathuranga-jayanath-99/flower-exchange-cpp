@@ -1,23 +1,34 @@
+#include "Heap.h"
+#include "Order.h"
 #include <algorithm>
 #include <vector>
 #include <iostream>
-#include "Heap.h"
 
 using namespace std;
 
-MaxHeap::MaxHeap(vector<int> values) {
-    heap = values;
+MaxHeap::MaxHeap(vector<Order> orders) {
+    heap = orders;
     make_heap(heap.begin(), heap.end());
 };
 
-void MaxHeap::insert(int value) {
-    heap.push_back(value);
+MaxHeap::MaxHeap() {
+    vector<Order> v({});
+    heap = v;
+    make_heap(heap.begin(), heap.end());
+};
+
+void MaxHeap::insert(Order order) {
+    heap.push_back(order);
     push_heap(heap.begin(), heap.end());
 };
 
-int MaxHeap::pop_top() {
+Order MaxHeap::peek_top() {
+    return heap[0];
+};
+
+Order MaxHeap::pop_top() {
     pop_heap(heap.begin(), heap.end());
-    int top = heap.back();
+    Order top = heap.back();
     heap.pop_back();
     return top;
 };
@@ -26,19 +37,33 @@ bool MaxHeap::is_empty() {
     return heap.begin() == heap.end();
 };
 
-MinHeap::MinHeap(vector<int> values) {
+void MaxHeap::update_top_item_quantity(int newQuantity) {
+    heap[0].setQuantity(newQuantity);
+};
+
+MinHeap::MinHeap(vector<Order> values) {
     heap = values;
     make_heap(heap.begin(), heap.end(), greater<>{});
 };
 
-void MinHeap::insert(int value) {
+MinHeap::MinHeap() {
+    vector<Order> v({});
+    heap = v;
+    make_heap(heap.begin(), heap.end(), greater<>{});
+};
+
+void MinHeap::insert(Order value) {
     heap.push_back(value);
     push_heap(heap.begin(), heap.end(), greater<>{});
 };
 
-int MinHeap::pop_top() {
+Order MinHeap::peek_top() {
+    return heap[0];
+};
+
+Order MinHeap::pop_top() {
     pop_heap(heap.begin(), heap.end(), greater<>{});
-    int top = heap.back();
+    Order top = heap.back();
     heap.pop_back();
     return top;
 };
@@ -46,3 +71,8 @@ int MinHeap::pop_top() {
 bool MinHeap::is_empty() {
     return heap.begin() == heap.end();
 };
+
+void MinHeap::update_top_item_quantity(int newQuantity) {
+    heap[0].setQuantity(newQuantity);
+}
+

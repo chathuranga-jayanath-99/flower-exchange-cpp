@@ -1,3 +1,6 @@
+#ifndef ORDER_H 
+#define ORDER_H
+
 #include <string>
 
 using namespace std;
@@ -23,4 +26,13 @@ class Order {
     int getQuantity();
 
     void setQuantity(int quantity);
+
+    inline bool operator<(const Order& order) const {
+      return price < order.price;
+    };
+    inline bool operator>(const Order& order) const {
+      return price > order.price;
+    };
 };
+
+#endif
