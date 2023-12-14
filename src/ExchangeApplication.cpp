@@ -264,7 +264,7 @@ class ExchangeApplication {
 
         file << "OrderID,ClientOrderID,Instrument,Side,ExecStatus,Quantity,"
                 "Price,"
-                "Reason\n";
+                "Reason,Timestamp\n";
 
         for (auto &orderEntry : orderEntries) {
             file << orderEntry.getOrderID() << ","
@@ -274,7 +274,8 @@ class ExchangeApplication {
                  << orderEntry.getExecStatus() << ","
                  << to_string(orderEntry.getQuantity()) << "," << std::fixed
                  << std::setprecision(2) << orderEntry.getPrice() << ","
-                 << orderEntry.getReason() << "\n";
+                 << orderEntry.getReason() << "," << orderEntry.getTimestamp()
+                 << "\n";
         }
 
         file.close();
