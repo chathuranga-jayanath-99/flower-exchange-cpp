@@ -110,7 +110,7 @@ class ExchangeApplication {
             while (getline(iss, message, MESSAGE_DELIMITER)) {
                 // Perform processing tasks here
                 cout << " Processed message: " << message << endl;
-                readFile(message, validOrders, orderEntries, orderIDMap,
+                readLine(message, validOrders, orderEntries, orderIDMap,
                          orderCount);
                 // lines.push_back(message);
             }
@@ -185,7 +185,7 @@ class ExchangeApplication {
     }
 
     // This function is used to read the file
-    void readFile(string &line, vector<Order> &validOrders,
+    void readLine(string &line, vector<Order> &validOrders,
                   vector<OrderEntry> &orderEntries,
                   map<string, string> &orderIDMap, int &orderCount) {
 
@@ -217,6 +217,8 @@ class ExchangeApplication {
 
         return;
     }
+
+    vector<OrderEntry> handleOrder(Order &order) {}
 
     vector<Order> getValidOrders() { return validOrders; }
 };
