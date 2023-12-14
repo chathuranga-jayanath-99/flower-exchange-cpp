@@ -1,6 +1,9 @@
 #include "Order.h"
 #include "OrderBook.h"
 #include "OrderEntry.h"
+#include "./enums/Instrument.h"
+#include "Constants.h"
+#include "Utils.h"
 #include <arpa/inet.h>
 #include <atomic>
 #include <condition_variable>
@@ -50,11 +53,11 @@ class ExchangeApplication {
     map<string, string> orderIDMap;
     int orderCount = 1;
 
-    OrderBook roseOrderBook = OrderBook("ROSE");
-    OrderBook lavenderOrderBook = OrderBook("LAVENDER");
-    OrderBook lotusOrderBook = OrderBook("LOTUS");
-    OrderBook tulipOrderBook = OrderBook("TULIP");
-    OrderBook orchidOrderBook = OrderBook("ORCHID");
+    OrderBook roseOrderBook = OrderBook(Instrument::ROSE);
+    OrderBook lavenderOrderBook = OrderBook(Instrument::LAVENDER);
+    OrderBook lotusOrderBook = OrderBook(Instrument::LOTUS);
+    OrderBook tulipOrderBook = OrderBook(Instrument::TULIP);
+    OrderBook orchidOrderBook = OrderBook(Instrument::ORCHID);
 
   public:
     static ExchangeApplication &getInstance(int clientSocket);
@@ -191,6 +194,22 @@ class ExchangeApplication {
         return result;
     }
 
+    Instrument getInstrumentFromString(string instrumentString) {
+        if (instrumentString == Constants::ROSE) {
+            return Instrument::ROSE;
+        } else if (instrumentString == Constants::LAVENDER) {
+            return Instrument::LAVENDER;
+        } else if (instrumentString == Constants::LOTUS) {
+            return Instrument::LOTUS;
+        } else if (instrumentString == Constants::ORCHID) {
+            return Instrument::ORCHID;
+        } else if (instrumentString == Constants::TULIP) {
+            return Instrument::TULIP;
+        } else {
+            throw invalid_argument("Invalid Instrument");
+        }
+    }
+
     // This function is used to read the file
     void readLine(string &line, vector<OrderEntry> &orderEntries,
                   map<string, string> &orderIDMap, int &orderCount) {
@@ -209,14 +228,16 @@ class ExchangeApplication {
 
         if (result[0] == 0) {
             if (result[1] != 0) {
+                string reasonStr = Utils::getReasonStrFromErrorCode(result[1]);
                 OrderEntry orderEntry(orderID, tokens[0], tokens[1],
-                                      stoi(tokens[2]), 1, stod(tokens[3]),
-                                      stoi(tokens[4]), result[1]);
+                                      stoi(tokens[2]), Constants::REJECTED, stod(tokens[3]),
+                                      stoi(tokens[4]), reasonStr);
                 orderEntries.push_back(orderEntry);
             } else {
             }
         } else {
-            Order order(orderID, tokens[0], tokens[1], stoi(tokens[2]),
+            Instrument instrument = getInstrumentFromString(tokens[1]);
+            Order order(orderID, tokens[0], instrument, stoi(tokens[2]),
                         stod(tokens[3]), stoi(tokens[4]));
             vector<OrderEntry> orderEntryVector = handleOrder(order);
             orderEntries.insert(orderEntries.end(), orderEntryVector.begin(),
@@ -227,16 +248,16 @@ class ExchangeApplication {
     }
 
     vector<OrderEntry> handleOrder(Order &order) {
-        string instrument = order.getInstrument();
-        if (instrument == "Rose") {
+        Instrument instrument = order.getInstrument();
+        if (instrument == Instrument::ROSE) {
             return roseOrderBook.processOrder(order);
-        } else if (instrument == "LAVENDER") {
+        } else if (instrument == Instrument::LAVENDER) {
             return lavenderOrderBook.processOrder(order);
-        } else if (instrument == "LOTUS") {
+        } else if (instrument == Instrument::LOTUS) {
             return lotusOrderBook.processOrder(order);
-        } else if (instrument == "TULIP") {
+        } else if (instrument == Instrument::TULIP) {
             return tulipOrderBook.processOrder(order);
-        } else if (instrument == "ORCHID") {
+        } else if (instrument == Instrument::ORCHID) {
             return orchidOrderBook.processOrder(order);
         } else {
             // Return empty vector

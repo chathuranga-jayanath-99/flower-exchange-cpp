@@ -10,12 +10,12 @@ using namespace std;
 
 int main() {
   vector<OrderEntry> completeReport;  
-  OrderBook rob("ROSE");
+  OrderBook rob(Instrument::ROSE);
   
-  Order o1("","aa13","rose",1,55,100);
-  Order o2("","aa14","rose",1,65,100);
-  Order o3("","aa15","rose",2,1,300);
-  Order o4("","aa16","rose",1,2,100);
+  Order o1("","aa13",Instrument::ROSE,1,55,100);
+  Order o2("","aa14",Instrument::ROSE,1,65,100);
+  Order o3("","aa15",Instrument::ROSE,2,1,300);
+  Order o4("","aa16",Instrument::ROSE,1,2,100);
   
   vector<OrderEntry> orderEntries1 = rob.processOrder(o1);
   for (size_t i = 0; i < orderEntries1.size(); i++)

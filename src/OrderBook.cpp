@@ -5,7 +5,7 @@
 
 using namespace std;
 
-OrderBook::OrderBook(string instrument) {
+OrderBook::OrderBook(Instrument instrument) {
     buySide = new MaxHeap();
     sellSide = new MinHeap();
     this->instrument = instrument;
@@ -41,11 +41,11 @@ void OrderBook::addBuyOrder(Order &order) { buySide->insert(order); }
 void OrderBook::addSellOrder(Order &order) { sellSide->insert(order); }
 
 void OrderBook::addOrderEntryToVector(vector<OrderEntry> &orderEntries,
-                                      Order &order, int statusCode,
+                                      Order &order, ExecutionStatus execStatus,
                                       double price, int quantity) {
     OrderEntry *orderEntryPtr = new OrderEntry(
         order.getOrderID(), order.getClientOrderId(), order.getInstrument(),
-        order.getSide(), statusCode, price, quantity, -1);
+        order.getSide(), execStatus, price, quantity, Reason::EMPTY);
     orderEntries.push_back(*orderEntryPtr);
 }
 
@@ -66,10 +66,10 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                         // remove sell order
                         OrderBook::removeMinSellOrder();
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, 2,
+                            processedOrderEntries, order, ExecutionStatus::FILL,
                             minSellOrder.getPrice(), order.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, minSellOrder, 2,
+                            processedOrderEntries, minSellOrder, ExecutionStatus::FILL,
                             minSellOrder.getPrice(),
                             minSellOrder.getQuantity());
                         break;
@@ -77,10 +77,10 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                         OrderBook::updateMinSellOrderQuantity(
                             minSellOrder.getQuantity() - orderQty);
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, 2,
+                            processedOrderEntries, order, ExecutionStatus::FILL,
                             minSellOrder.getPrice(), order.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, minSellOrder, 3,
+                            processedOrderEntries, minSellOrder, ExecutionStatus::PFILL,
                             minSellOrder.getPrice(), order.getQuantity());
                         break;
                     } else {
@@ -89,11 +89,11 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                                           minSellOrder.getQuantity());
                         OrderBook::removeMinSellOrder();
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, 3,
+                            processedOrderEntries, order, ExecutionStatus::PFILL,
                             minSellOrder.getPrice(),
                             minSellOrder.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, minSellOrder, 2,
+                            processedOrderEntries, minSellOrder, ExecutionStatus::FILL,
                             minSellOrder.getPrice(),
                             minSellOrder.getQuantity());
                         orderPartialFilled = true;
@@ -103,7 +103,7 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                     OrderBook::addBuyOrder(order);
                     if (!orderPartialFilled) {
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, 0, order.getPrice(),
+                            processedOrderEntries, order, ExecutionStatus::NEW, order.getPrice(),
                             order.getQuantity());
                     }
                     break;
@@ -113,7 +113,7 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                 OrderBook::addBuyOrder(order);
                 if (!orderPartialFilled) {
                     OrderBook::addOrderEntryToVector(processedOrderEntries,
-                                                     order, 0, order.getPrice(),
+                                                     order, ExecutionStatus::NEW, order.getPrice(),
                                                      order.getQuantity());
                 }
                 break;
@@ -132,20 +132,20 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                     if (orderSellQuantity == maxBuyOrder.getQuantity()) {
                         OrderBook::removeMaxBuyOrder();
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, 2,
+                            processedOrderEntries, order, ExecutionStatus::FILL,
                             maxBuyOrder.getPrice(), order.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, maxBuyOrder, 2,
+                            processedOrderEntries, maxBuyOrder, ExecutionStatus::FILL,
                             maxBuyOrder.getPrice(), order.getQuantity());
                         break;
                     } else if (orderSellQuantity < maxBuyOrder.getQuantity()) {
                         OrderBook::updateMaxBuyOrderQuantity(
                             maxBuyOrder.getQuantity() - orderSellQuantity);
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, 2,
+                            processedOrderEntries, order, ExecutionStatus::FILL,
                             maxBuyOrder.getPrice(), order.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, maxBuyOrder, 3,
+                            processedOrderEntries, maxBuyOrder, ExecutionStatus::PFILL,
                             maxBuyOrder.getPrice(), order.getQuantity());
                         break;
                     } else {
@@ -153,10 +153,10 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                                           maxBuyOrder.getQuantity());
                         OrderBook::removeMaxBuyOrder();
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, 3,
+                            processedOrderEntries, order, ExecutionStatus::PFILL,
                             maxBuyOrder.getPrice(), maxBuyOrder.getQuantity());
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, maxBuyOrder, 2,
+                            processedOrderEntries, maxBuyOrder, ExecutionStatus::FILL,
                             maxBuyOrder.getPrice(), maxBuyOrder.getQuantity());
                         orderPartialFilled = true;
                     }
@@ -165,7 +165,7 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                     OrderBook::addSellOrder(order);
                     if (!orderPartialFilled) {
                         OrderBook::addOrderEntryToVector(
-                            processedOrderEntries, order, 0, order.getPrice(),
+                            processedOrderEntries, order, ExecutionStatus::NEW, order.getPrice(),
                             order.getQuantity());
                     }
                     break;
@@ -175,7 +175,7 @@ vector<OrderEntry> OrderBook::processOrder(Order &order) {
                 OrderBook::addSellOrder(order);
                 if (!orderPartialFilled) {
                     OrderBook::addOrderEntryToVector(processedOrderEntries,
-                                                     order, 0, order.getPrice(),
+                                                     order, ExecutionStatus::NEW, order.getPrice(),
                                                      order.getQuantity());
                 }
                 break;
