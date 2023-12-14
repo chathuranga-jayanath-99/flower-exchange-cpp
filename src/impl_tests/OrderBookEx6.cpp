@@ -10,7 +10,7 @@ using namespace std;
 
 int main() {
   vector<OrderEntry> completeReport;  
-  RoseOrderBook rob;
+  OrderBook rob("ROSE");
   
   Order o1("","aa13","rose",1,55,100);
   Order o2("","aa14","rose",1,65,100);

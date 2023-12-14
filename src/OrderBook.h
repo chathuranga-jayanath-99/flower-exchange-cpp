@@ -8,10 +8,10 @@
 
 using namespace std;
 
-class BaseOrderBook {
+class OrderBook {
   public:
-    BaseOrderBook();
-    ~BaseOrderBook();
+    OrderBook(string instrument);
+    ~OrderBook();
     void addOrder(const string &clientOrderIdPtr, const string &instrumentPtr,
                   int side, double price, int quantity);
     void modifyOrder(const string &clientOrderIdPtr, const string &instrumentPtr,
@@ -36,31 +36,7 @@ class BaseOrderBook {
   private:
     MaxHeap* buySide;
     MinHeap* sellSide;
-};
-
-class RoseOrderBook : public BaseOrderBook {
-  public:
-    RoseOrderBook();
-};
-
-class LavenderOrderBook : public BaseOrderBook {
-  public:
-    LavenderOrderBook();
-};
-
-class LotusOrderBook : public BaseOrderBook {
-  public:
-    LotusOrderBook();
-};
-
-class TulipOrderBook : public BaseOrderBook {
-  public:
-    TulipOrderBook();
-};
-
-class OrchidOrderBook : public BaseOrderBook {
-  public:
-    OrchidOrderBook();
+    string instrument;
 };
 
 #endif
