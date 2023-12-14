@@ -122,7 +122,7 @@ int main() {
 
     // Send data to the server
     for (auto &line : lines) {
-        sleep(1);
+        // sleep(1);
         publishVector(line, clientSocket);
     }
 

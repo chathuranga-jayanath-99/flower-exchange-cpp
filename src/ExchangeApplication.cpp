@@ -1,4 +1,5 @@
 #include "Order.h"
+#include "OrderBook.h"
 #include "OrderEntry.h"
 #include <arpa/inet.h>
 #include <atomic>
@@ -48,6 +49,12 @@ class ExchangeApplication {
     vector<OrderEntry> orderEntries;
     map<string, string> orderIDMap;
     int orderCount = 1;
+
+    OrderBook roseOrderBook = OrderBook("ROSE");
+    OrderBook lavenderOrderBook = OrderBook("LAVENDER");
+    OrderBook lotusOrderBook = OrderBook("LOTUS");
+    OrderBook tulipOrderBook = OrderBook("TULIP");
+    OrderBook orchidOrderBook = OrderBook("ORCHID");
 
   public:
     static ExchangeApplication &getInstance(int clientSocket);
@@ -212,15 +219,35 @@ class ExchangeApplication {
         } else {
             Order order(orderID, tokens[0], tokens[1], stoi(tokens[2]),
                         stod(tokens[3]), stoi(tokens[4]));
-            validOrders.push_back(order);
+            vector<OrderEntry> orderEntryVector = handleOrder(order);
+            orderEntries.insert(orderEntries.end(), orderEntryVector.begin(),
+                                orderEntryVector.end());
         }
 
         return;
     }
 
-    vector<OrderEntry> handleOrder(Order &order) {}
+    vector<OrderEntry> handleOrder(Order &order) {
+        string instrument = order.getInstrument();
+        if (instrument == "Rose") {
+            return roseOrderBook.processOrder(order);
+        } else if (instrument == "LAVENDER") {
+            return lavenderOrderBook.processOrder(order);
+        } else if (instrument == "LOTUS") {
+            return lotusOrderBook.processOrder(order);
+        } else if (instrument == "TULIP") {
+            return tulipOrderBook.processOrder(order);
+        } else if (instrument == "ORCHID") {
+            return orchidOrderBook.processOrder(order);
+        } else {
+            // Return empty vector
+            vector<OrderEntry> orderEntryVector;
+            return orderEntryVector;
+        }
+    }
 
     vector<Order> getValidOrders() { return validOrders; }
+    vector<OrderEntry> getOrderEntries() { return orderEntries; }
 };
 
 ExchangeApplication &ExchangeApplication::getInstance(int clientSocket) {
@@ -283,6 +310,11 @@ int main() {
     cout << "Valid Orders: " << endl;
     for (auto &order : ex_app.getValidOrders()) {
         order.printOrder();
+    }
+
+    cout << "Order Entries: " << endl;
+    for (auto &orderEntry : ex_app.getOrderEntries()) {
+        orderEntry.printOrderEntry();
     }
 
     return 0;
