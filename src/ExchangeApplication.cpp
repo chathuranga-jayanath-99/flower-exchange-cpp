@@ -272,7 +272,7 @@ class ExchangeApplication {
         cout << "Enter the name of the file you want to write: ";
         cin >> filename;
 
-        string fullFileName = "./results/result" + filename + ".csv";
+        string fullFileName = "./results/" + filename + ".csv";
         // string fullFileName = "./results/result7.csv";
 
         ofstream file(fullFileName);
