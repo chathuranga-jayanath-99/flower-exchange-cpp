@@ -1,6 +1,7 @@
 #include "Order.h"
 #include "OrderEntry.h"
 #include <arpa/inet.h>
+#include <chrono>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -9,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <sys/socket.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
@@ -26,9 +28,9 @@ vector<string> split(const string &str, char delimiter) {
     return tokens;
 }
 
-void publishVector(const std::vector<string> &data, int clientSocket) {
+void publishVector(const vector<string> &data, int clientSocket) {
     // Serialize vector into a string
-    std::string serializedData;
+    string serializedData;
     for (const auto &element : data) {
         serializedData += element + ',';
     }
@@ -36,7 +38,7 @@ void publishVector(const std::vector<string> &data, int clientSocket) {
 
     // Send serialized vector to the client
     send(clientSocket, serializedData.c_str(), serializedData.size(), 0);
-    std::cout << "Vector published to the socket.\n";
+    cout << "Vector published to the socket.\n";
 }
 
 class Trader {
@@ -105,7 +107,7 @@ int main() {
     // Create a socket
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket == -1) {
-        std::cerr << "Error creating socket" << std::endl;
+        cerr << "Error creating socket" << endl;
         return -1;
     }
 
@@ -119,16 +121,21 @@ int main() {
     // Connect to the server
     if (connect(clientSocket, (struct sockaddr *)&serverAddr,
                 sizeof(serverAddr)) == -1) {
-        std::cerr << "Error connecting to server" << std::endl;
+        cerr << "Error connecting to server" << endl;
         close(clientSocket);
         return -1;
     }
 
-    std::cout << "Connected to the server" << std::endl;
+    cout << "Connected to the server" << endl;
 
     // Send data to the server
+    int counter = 0;
     for (auto &line : lines) {
         // sleep(1);
+        if (counter++ == 1000) {
+            this_thread::sleep_for(chrono::milliseconds(100));
+            counter = 0;
+        }
         publishVector(line, clientSocket);
     }
 

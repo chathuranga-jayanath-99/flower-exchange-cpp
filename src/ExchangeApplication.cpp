@@ -78,7 +78,7 @@ class ExchangeApplication {
     void receiveThread() {
 
         while (true) {
-            char chunk[4096];
+            char chunk[1024 * 32];
             ssize_t bytesRead = recv(clientSocket, chunk, sizeof(chunk), 0);
 
             if (bytesRead > 0) {
