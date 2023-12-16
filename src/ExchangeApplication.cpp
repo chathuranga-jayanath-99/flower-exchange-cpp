@@ -155,7 +155,7 @@ class ExchangeApplication {
         int token_count = 0;
         for (auto &token : tokens) {
             if (token == "") {
-                cout << "Empty" << endl;
+                // cout << "Empty" << endl;
                 result[0] = 0;
                 result[1] = 0;
                 result[2] = token_count;
@@ -217,11 +217,11 @@ class ExchangeApplication {
 
         vector<string> tokens = split(line, ',');
 
-        cout << "Tokens: ";
-        for (const auto &token : tokens) {
-            cout << token << " ";
-        }
-        cout << endl;
+        // cout << "Tokens: ";
+        // for (const auto &token : tokens) {
+        //     cout << token << " ";
+        // }
+        // cout << endl;
 
         string orderID = orderIdGenerator(orderIDMap, tokens[0], orderCount);
 
@@ -372,10 +372,10 @@ int main() {
 
     ex_app.start(clientSocket);
 
-    cout << "Order Entries: " << endl;
-    for (auto &orderEntry : ex_app.getOrderEntries()) {
-        orderEntry.printOrderEntry();
-    }
+    // cout << "Order Entries: " << endl;
+    // for (auto &orderEntry : ex_app.getOrderEntries()) {
+    //     orderEntry.printOrderEntry();
+    // }
 
     ex_app.writeFile();
 
