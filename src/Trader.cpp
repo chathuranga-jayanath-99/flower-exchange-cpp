@@ -1,6 +1,7 @@
 #include "Order.h"
 #include "OrderEntry.h"
 #include <arpa/inet.h>
+#include <chrono>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -9,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <sys/socket.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
@@ -26,33 +28,20 @@ vector<string> split(const string &str, char delimiter) {
     return tokens;
 }
 
-void publishVector(const std::vector<string> &data, int clientSocket) {
-    // Serialize vector into a string
-    std::string serializedData;
-    for (const auto &element : data) {
-        serializedData += element + ' ';
-    }
-    serializedData += MESSAGE_DELIMITER;
-
-    // Send serialized vector to the client
-    send(clientSocket, serializedData.c_str(), serializedData.size(), 0);
-    std::cout << "Vector published to the socket.\n";
-}
-
 class Trader {
 
   public:
     static Trader &get() { return trader_app; }
 
     // This function is used to read the file
-    void readFile(vector<vector<string>> &lines) {
-        // string filename;
+    void readFile(vector<string> &lines) {
+        string filename;
 
-        // cout << "Enter the name of the file you want to read: ";
-        // cin >> filename;
+        cout << "Enter the name of the file you want to read: ";
+        cin >> filename;
 
-        // string fullFileName = "./testcases/" + filename + ".csv";
-        string fullFileName = "./testcases/example2.csv";
+        string fullFileName = "./testcases/" + filename + ".csv";
+        // string fullFileName = "./testcases/example7.csv";
 
         ifstream file(fullFileName);
 
@@ -67,12 +56,24 @@ class Trader {
         string line;
         while (getline(file, line)) {
 
-            vector<string> tokens = split(line, ',');
-            lines.push_back(tokens);
+            if (!line.empty() && line[line.length() - 1] == '\r') {
+                line.erase(line.length() - 1);
+            }
+
+            lines.push_back(line);
         }
 
         file.close();
         return;
+    }
+
+    void publishVector(string &data, int clientSocket) {
+        // Add delimiter to the end of the string
+        data += MESSAGE_DELIMITER;
+
+        // Send serialized string to the client
+        send(clientSocket, data.c_str(), data.size(), 0);
+        cout << "Vector published to the socket.\n";
     }
 
   private:
@@ -86,7 +87,7 @@ Trader Trader::trader_app;
 
 int main() {
     Trader &trader_app = Trader::get();
-    vector<vector<string>> lines;
+    vector<string> lines;
 
     trader_app.readFile(lines);
 
@@ -99,7 +100,7 @@ int main() {
     // Create a socket
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket == -1) {
-        std::cerr << "Error creating socket" << std::endl;
+        cerr << "Error creating socket" << endl;
         return -1;
     }
 
@@ -113,19 +114,22 @@ int main() {
     // Connect to the server
     if (connect(clientSocket, (struct sockaddr *)&serverAddr,
                 sizeof(serverAddr)) == -1) {
-        std::cerr << "Error connecting to server" << std::endl;
+        cerr << "Error connecting to server" << endl;
         close(clientSocket);
         return -1;
     }
 
-    std::cout << "Connected to the server" << std::endl;
+    cout << "Connected to the server" << endl;
 
-    // Send data to the server
+    int counter = 0;
     for (auto &line : lines) {
         // sleep(1);
-        publishVector(line, clientSocket);
+        if (counter++ == 1000) {
+            this_thread::sleep_for(chrono::milliseconds(100));
+            counter = 0;
+        }
+        trader_app.publishVector(line, clientSocket);
     }
 
-    // Clean up
     close(clientSocket);
 }

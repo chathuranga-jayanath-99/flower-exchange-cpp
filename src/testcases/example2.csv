@@ -1,24 +1,4 @@
-Client Order ID,Instrument,Side,Price,Quantity
-aa13,Rose,2,55.00,100
-aa14,Rose,2,45.00,100
-aa15,Rose,1,35.00,100
-aa16,Tulip,1,25.00,50
-aa17,Tulip,2,30.00,75
-aa18,Sunflower,1,40.00,80
-aa19,Lily,2,28.00,120
-aa20,Daisy,1,22.50,90
-aa21,Daisy,1,24.00,60
-aa22,Sunflower,2,42.00,110
-aa23,Rose,2,48.50,70
-aa24,Tulip,1,27.00,85
-aa25,Lily,1,33.50,95
-aa26,Rose,2,50.00,60
-aa27,Daisy,1,20.00,100
-aa28,Sunflower,2,38.00,80
-aa29,Tulip,1,29.00,120
-aa30,Lily,2,31.50,110
-aa31,Sunflower,1,45.00,70
-aa32,Daisy,2,18.00,50
-aa33,Rose,1,40.00,85
-aa34,Tulip,2,32.50,95
-aa35,Lily,1,26.00,60
+Client Order ID,Instrument,Side,Quantity,Price
+aa13,Rose,2,100,55.00
+aa14,Rose,2,100,45.00
+aa15,Rose,1,100,35.00
