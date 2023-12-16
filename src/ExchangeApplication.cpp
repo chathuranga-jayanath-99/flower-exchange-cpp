@@ -148,20 +148,16 @@ class ExchangeApplication {
     // This function is used to filter out invalid orders
     int *filterTokens(vector<string> &tokens) {
 
-        int *result = new int[3]; // result[0] = 1 if valid, 0 if invalid
+        int *result = new int[2]; // result[0] = 1 if valid, 0 if invalid
                                   // result[1] = error code
-                                  // result[2] = missing token index
 
-        int token_count = 0;
         for (auto &token : tokens) {
             if (token == "") {
                 // cout << "Empty" << endl;
                 result[0] = 0;
                 result[1] = 0;
-                result[2] = token_count;
                 return result;
             }
-            token_count++;
         }
 
         int side = stoi(tokens[2]);
@@ -171,27 +167,23 @@ class ExchangeApplication {
         if (side > 2 || side < 1) {
             result[0] = 0;
             result[1] = 1;
-            result[2] = -1;
             return result;
         }
 
         if (price <= 0) {
             result[0] = 0;
             result[1] = 2;
-            result[2] = -1;
             return result;
         }
 
         if (quantity <= 10 || quantity >= 1000 || quantity % 10 != 0) {
             result[0] = 0;
             result[1] = 3;
-            result[2] = -1;
             return result;
         }
 
         result[0] = 1;
         result[1] = -1;
-        result[2] = -1;
         return result;
     }
 
