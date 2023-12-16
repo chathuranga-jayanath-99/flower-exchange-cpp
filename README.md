@@ -1,8 +1,11 @@
 # flower-exchange-cpp
-Highly Focused
-- In oder books' buy side always highest price should be on top
-- In oder books' sell side always lowest price should be on top
-- In oder books' both sides newly added row with same price should be added to bottom
-- Once order get `FILL` status, it should be removed from respective order book
-- Once order is placing if there is a matching, it doesn't go to order book. Chnages directly occur in the execution report. 
-- Handle `PFILL` status. (Look into example 4)
+
+Flower exhange system supports basic trading. This system contains two applications: Trader Application and Exchange Application. 
+- Trader Application focuses on submitting buy or sell orders for flowers.
+- Exchange application focuses on incodimg order against existing order in the order book and do a full or partial execution. 
+
+System is implemented using a socket to communicate between Trader Application and Exhange Application. Trader Application will read orders from a .csv which contains orders. Then it passes each order to the Exchange Application for processing. After processing Exchange Application will generate Execution Report. These Execution Reports are writen to a .csv file. 
+
+## Execute
+
+Executing following commandd will start the execution of the program. 
