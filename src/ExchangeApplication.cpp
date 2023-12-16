@@ -290,9 +290,9 @@ class ExchangeApplication {
             file << orderEntry.getOrderID() << ","
                  << orderEntry.getClientOrderId() << ","
                  << orderEntry.getInstrument() << "," << orderEntry.getSide()
-                 << "," << orderEntry.getQuantity() << ","
-                 << orderEntry.getExecStatus() << "," << std::fixed
-                 << std::setprecision(2) << orderEntry.getPrice() << ","
+                 << "," << orderEntry.getExecStatus() << ","
+                 << orderEntry.getQuantity() << "," << std::fixed
+                 << std::setprecision(2) << stod(orderEntry.getPrice()) << ","
                  << orderEntry.getReason() << "," << orderEntry.getTimestamp()
                  << "\n";
         }
