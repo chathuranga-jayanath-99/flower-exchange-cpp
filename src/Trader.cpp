@@ -28,26 +28,13 @@ vector<string> split(const string &str, char delimiter) {
     return tokens;
 }
 
-void publishVector(const vector<string> &data, int clientSocket) {
-    // Serialize vector into a string
-    string serializedData;
-    for (const auto &element : data) {
-        serializedData += element + ',';
-    }
-    serializedData += MESSAGE_DELIMITER;
-
-    // Send serialized vector to the client
-    send(clientSocket, serializedData.c_str(), serializedData.size(), 0);
-    cout << "Vector published to the socket.\n";
-}
-
 class Trader {
 
   public:
     static Trader &get() { return trader_app; }
 
     // This function is used to read the file
-    void readFile(vector<vector<string>> &lines) {
+    void readFile(vector<string> &lines) {
         string filename;
 
         cout << "Enter the name of the file you want to read: ";
@@ -69,18 +56,24 @@ class Trader {
         string line;
         while (getline(file, line)) {
 
-            cout << line << endl;
-
             if (!line.empty() && line[line.length() - 1] == '\r') {
                 line.erase(line.length() - 1);
             }
 
-            vector<string> tokens = split(line, ',');
-            lines.push_back(tokens);
+            lines.push_back(line);
         }
 
         file.close();
         return;
+    }
+
+    void publishVector(string &data, int clientSocket) {
+        // Add delimiter to the end of the string
+        data += MESSAGE_DELIMITER;
+
+        // Send serialized string to the client
+        send(clientSocket, data.c_str(), data.size(), 0);
+        cout << "Vector published to the socket.\n";
     }
 
   private:
@@ -94,7 +87,7 @@ Trader Trader::trader_app;
 
 int main() {
     Trader &trader_app = Trader::get();
-    vector<vector<string>> lines;
+    vector<string> lines;
 
     trader_app.readFile(lines);
 
@@ -128,7 +121,6 @@ int main() {
 
     cout << "Connected to the server" << endl;
 
-    // Send data to the server
     int counter = 0;
     for (auto &line : lines) {
         // sleep(1);
@@ -136,9 +128,8 @@ int main() {
             this_thread::sleep_for(chrono::milliseconds(100));
             counter = 0;
         }
-        publishVector(line, clientSocket);
+        trader_app.publishVector(line, clientSocket);
     }
 
-    // Clean up
     close(clientSocket);
 }
