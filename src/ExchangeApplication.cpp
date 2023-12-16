@@ -38,6 +38,7 @@ class ExchangeApplication {
   private:
     ExchangeApplication(int clientSocket);
     ~ExchangeApplication(){};
+
     string receivedBuffer; // Shared buffer to store received data
     mutex bufferMutex;     // Mutex to synchronize access to the shared buffer
     condition_variable
@@ -50,7 +51,6 @@ class ExchangeApplication {
     thread processThreadObj;
 
     vector<OrderEntry> orderEntries;
-    map<string, string> orderIDMap;
     int orderCount = 1;
 
     OrderBook roseOrderBook = OrderBook(Instrument::ROSE);
@@ -121,7 +121,7 @@ class ExchangeApplication {
             while (getline(iss, message, MESSAGE_DELIMITER)) {
                 // Perform processing tasks here
                 cout << " Processed message: " << message << endl;
-                readLine(message, orderEntries, orderIDMap, orderCount);
+                readLine(message, orderEntries, orderCount);
                 // lines.push_back(message);
             }
 
@@ -134,15 +134,8 @@ class ExchangeApplication {
     }
 
     // This function is used to generate orderID for each unique order
-    string orderIdGenerator(map<string, string> &orderIDMap,
-                            string &clientOrderId, int &orderCount) {
-        if (orderIDMap.find(clientOrderId) == orderIDMap.end()) {
-            orderIDMap[clientOrderId] = "ord" + to_string(orderCount);
-            orderCount++;
-            return orderIDMap[clientOrderId];
-        } else {
-            return orderIDMap[clientOrderId];
-        }
+    string orderIdGenerator(int &orderCount) {
+        return "ord" + to_string(orderCount++);
     }
 
     // This function is used to filter out invalid orders
@@ -206,7 +199,7 @@ class ExchangeApplication {
 
     // This function is used to read the file
     void readLine(string &line, vector<OrderEntry> &orderEntries,
-                  map<string, string> &orderIDMap, int &orderCount) {
+                  int &orderCount) {
 
         vector<string> tokens = split(line, ',');
 
@@ -222,7 +215,7 @@ class ExchangeApplication {
         string quantity = tokens[3];
         string price = tokens[4];
 
-        string orderID = orderIdGenerator(orderIDMap, tokens[0], orderCount);
+        string orderID = orderIdGenerator(orderCount);
 
         int *result =
             filterTokens(clientOrderId, instrument_str, side, price, quantity);
@@ -302,16 +295,6 @@ class ExchangeApplication {
     }
 
     vector<OrderEntry> getOrderEntries() { return orderEntries; }
-
-    void setOrderEntries(vector<OrderEntry> orderEntries) {
-        this->orderEntries = orderEntries;
-    }
-
-    void setOrderIDMap(map<string, string> orderIDMap) {
-        this->orderIDMap = orderIDMap;
-    }
-
-    void setOrderCount(int orderCount) { this->orderCount = orderCount; }
 };
 
 ExchangeApplication &ExchangeApplication::getInstance(int clientSocket) {
