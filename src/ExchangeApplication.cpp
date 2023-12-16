@@ -146,23 +146,24 @@ class ExchangeApplication {
     }
 
     // This function is used to filter out invalid orders
-    int *filterTokens(vector<string> &tokens) {
+    int *filterTokens(string &clientID, string &instrument_str,
+                      string &side_str, string &price_str,
+                      string &quantity_str) {
 
         int *result = new int[2]; // result[0] = 1 if valid, 0 if invalid
                                   // result[1] = error code
 
-        for (auto &token : tokens) {
-            if (token == "") {
-                // cout << "Empty" << endl;
-                result[0] = 0;
-                result[1] = 0;
-                return result;
-            }
+        if (clientID.empty() || instrument_str.empty() || side_str.empty() ||
+            price_str.empty() || quantity_str.empty()) {
+            // cout << "Empty" << endl;
+            result[0] = 0;
+            result[1] = 0;
+            return result;
         }
 
-        int side = stoi(tokens[2]);
-        int price = stod(tokens[3]);
-        int quantity = stoi(tokens[4]);
+        int side = stoi(side_str);
+        int price = stod(price_str);
+        int quantity = stoi(quantity_str);
 
         if (side > 2 || side < 1) {
             result[0] = 0;
@@ -215,21 +216,28 @@ class ExchangeApplication {
         // }
         // cout << endl;
 
+        string clientOrderId = tokens[0];
+        string instrument_str = tokens[1];
+        string side = tokens[2];
+        string quantity = tokens[3];
+        string price = tokens[4];
+
         string orderID = orderIdGenerator(orderIDMap, tokens[0], orderCount);
 
-        int *result = filterTokens(tokens);
+        int *result =
+            filterTokens(clientOrderId, instrument_str, side, price, quantity);
 
         if (result[0] == 0) {
             string reasonStr = Utils::getReasonStrFromErrorCode(result[1]);
-            OrderEntry orderEntry(orderID, tokens[0], tokens[1], tokens[2],
-                                  Constants::REJECTED, tokens[3], tokens[4],
+            OrderEntry orderEntry(orderID, clientOrderId, instrument_str, side,
+                                  Constants::REJECTED, price, quantity,
                                   reasonStr);
             orderEntries.push_back(orderEntry);
 
         } else {
-            Instrument instrument = getInstrumentFromString(tokens[1]);
-            Order order(orderID, tokens[0], instrument, stoi(tokens[2]),
-                        stod(tokens[3]), stoi(tokens[4]));
+            Instrument instrument = getInstrumentFromString(instrument_str);
+            Order order(orderID, clientOrderId, instrument, stoi(side),
+                        stod(price), stoi(quantity));
             vector<OrderEntry> orderEntryVector = handleOrder(order);
             orderEntries.insert(orderEntries.end(), orderEntryVector.begin(),
                                 orderEntryVector.end());
