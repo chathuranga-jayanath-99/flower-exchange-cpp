@@ -1,6 +1,3 @@
-SRCS1 = Trader.cpp 
-SRCS2 = Order.cpp Heap.cpp  OrderBook.cpp OrderEntry.cpp Utils.cpp ExchangeApplication.cpp
-
 trader: Trader.o 
 	g++ Trader.o -o trader 
 
