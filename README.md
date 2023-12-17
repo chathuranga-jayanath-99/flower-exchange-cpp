@@ -6,7 +6,7 @@ The Flower exhange system supports basic processing of orders. This system conta
 
 Trader Application will read orders from the input csv file in `inputs` directory. User can enter which file to be entered. Then Trader Application passes each order to the Exchange Application for processing. 
 
-After processing Exchange Application will generate an Execution Report. These Execution Reports are writen to a .csv file. User can enter which file to be written. Output file will be stored in the `results` directory. 
+After processing Exchange Application will generate an Execution Report. These Execution Reports are writen to a .csv file. User can enter which file to be written. Output file will be stored in the `results` directory. Invalid orders will be rejected.
 
 
 ## Execution
@@ -48,7 +48,7 @@ Advantages:
 ## Experimentation
 
 - The system passes all 7 given input testcases. The results can be found in src/testresults
-- We tested the system with 25,177 orders. The system generated 35,670 order entries in [] seconds.
+- We tested the system with `25,177` orders. The system generated 35,670 order entries in `2.642334` seconds.
 
  
 
