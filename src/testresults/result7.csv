@@ -1,6 +1,6 @@
 OrderID,ClientOrderID,Instrument,Side,ExecStatus,Quantity,Price,Reason,Timestamp
-ord1,aa13,,1,100,Rejected,55.00,Invalid instrument,20231214-232747.412331
-ord2,aa14,Rose,3,100,Rejected,65.00,Invalid side,20231214-232747.412483
-ord3,aa15,Lavender,2,101,Rejected,1.00,Invalid size,20231214-232747.412534
-ord4,aa16,Tulip,1,100,Rejected,-1.00,Invalid price,20231214-232747.412571
-ord5,aa17,Orchid,1,1000,Rejected,-1.00,Invalid price,20231214-232747.412601
+ord1,aa13,,1,Rejected,100,55.00,Invalid instrument,20231217-235343.122278
+ord2,aa14,Rose,3,Rejected,100,65.00,Invalid side,20231217-235343.122336
+ord3,aa15,Lavender,2,Rejected,101,1.00,Invalid size,20231217-235343.122344
+ord4,aa16,Tulip,1,Rejected,100,-1.00,Invalid price,20231217-235343.122351
+ord5,aa17,Orchid,1,Rejected,1000,-1.00,Invalid price,20231217-235343.122356
