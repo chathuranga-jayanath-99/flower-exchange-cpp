@@ -8,8 +8,7 @@ System is implemented using a socket to communicate between Trader Application a
 
 ## Execute
 
-1. Move inside the `src` directory.
-2. Then execute the command `make run`. 
+2. Execute the command `make run`. 
 3. It will open 2 terminals one for Trader Application and another for Exchange Application. 
 4. Go to Trader Application and provide the input filename (file must be available in the `inputs` directory), you need to open.
 5. The it will start sending data to Exchange Application. 
