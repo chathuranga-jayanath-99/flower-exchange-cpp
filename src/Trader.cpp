@@ -40,7 +40,7 @@ class Trader {
         cout << "Enter the name of the file you want to read: ";
         cin >> filename;
 
-        string fullFileName = "./testcases/" + filename + ".csv";
+        string fullFileName = "./inputs/" + filename + ".csv";
         // string fullFileName = "./testcases/example7.csv";
 
         ifstream file(fullFileName);
