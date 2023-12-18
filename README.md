@@ -26,15 +26,13 @@ If the filename is `input.csv` enter `input`
 ## Implementation details
 
 ### Socket Programming
-
-System is implemented using a socket to communicate between Trader Application and Exhange Application. Exchange application starts first. It opens a port and waits for incoming connections. The trader application, upon startup connects to the port and sends data.
+System is implemented using a socket to communicate between Trader Application and Exhange Application. The Exchange application starts first. It opens a port and waits for incoming connections. The trader application, upon startup connects to the port and sends data. Upon sending all the data, the trader closes the connection. <br />
+In the current implementation, the exchange application also terminates after the connection is closed and all data is processed, instead of listening for connection again. This is done under the assumption that only on csv file is processed at once.
 
 ### Design Patterns
-
 Both the Trader and ExchangeApplication class follows a singleton pattern, adhering to the fact that only one instantiation should happen.
 
 ### Multithreading
-
 The exchange application spawns two threads in addition to the main thread: Receiver and processor
 The receiver listens for incoming data from the port, obtains them and publish them to a shared buffer.
 The processor waits until there is data available in the shared buffer and if there is, does all the subsequent processing.
@@ -43,6 +41,27 @@ The shared resource, the buffer is made thread safe using a lock and a condition
 Advantages:
 - Processing orders does not need to wait until all orders are received.
 - Incoming orders will not be lost in communication.
+
+
+### Batch Processing
+Due to the memory allocated in the receive buffer of the socket, there is a limitation to the amount of data receievable at once. <br />
+Currently 32 * 1024 * sizeof(char) is allocated which can receive around 1000 orders at once. <br />
+Therefore if the trader receives more than 1000 orders, it waits a certain amount of time (100ms) before sending data again.
+This allows the receiver thread to publish received data to the shared buffer and clear the receive buffer.
+
+
+### Object Oriented Programming
+The application adheres to Object-Oriented Programming principles, where the system is structured based on classes, acting as the foundation for object creation. <br />
+Classes used and their objectives
+- Trader - Trader application
+- ExchangeApplication - Exchange application
+- Order - Models orders
+- OrderBook - Stores orders in heaps and process incoming orders
+- OrderEntry - Models entries in the execution report
+- Heap - Stores orders in Minheap or Maxheap
+
+### Data Structures
+The Order book for each instrument often gets updated. In each order book, the buy side always wants to keep the highest price order on top and the sell side always wants to keep the lowest price order on top. To satisfy those conditions a heap data structure is used. A max heap is allocated for each order book to maintain the buy side and a min heap is allocated for each order book to maintain the sell side.
 
 
 ## Experimentation
